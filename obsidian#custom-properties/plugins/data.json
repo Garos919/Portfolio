@@ -1,0 +1,13 @@
+{
+  "map": {
+    "id": "id",
+    "type": "type",
+    "category": "category",
+    "child": "child",
+    "tags": "tags",
+    "author": "author",
+    "version": "version",
+    "last update": "last update",
+    "status": "status"
+  }
+}
