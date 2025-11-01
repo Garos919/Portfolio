@@ -1,5 +1,8 @@
 # Custom Properties Plugin for Obsidian
 
+[Download Plugin](https://download-directory.github.io/?url=https://github.com/Garos919/Portfolio/tree/main/plugins/obsidian%23custom-properties)
+
+
 > **Portfolio Project**: A comprehensive Obsidian plugin that revolutionizes structured documentation through specialized property types, automatic template management, and hierarchical organization.
 
 ## Overview
@@ -306,5 +309,3 @@ This plugin demonstrates several advanced Obsidian development techniques:
 **Compatibility:** Obsidian 1.4.0+  
 **License:** MIT  
 **Author:** Nicholas Garos
-
-This plugin showcases advanced Obsidian development techniques and provides a foundation for structured documentation systems in any domain.
