@@ -1,6 +1,6 @@
 # Custom Properties Plugin for Obsidian
 
-[Download Plgin](https://raw.githubusercontent.com/Garos919/Portfolio/main/plugins/obsidian%23custom-properties/obsidian-plugin-custom-properties.rar)
+[Download Plugin](https://raw.githubusercontent.com/Garos919/Portfolio/main/plugins/obsidian%23custom-properties/obsidian-plugin-custom-properties.rar)
 
 
 
