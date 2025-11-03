@@ -1,23 +1,435 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Space Dodger</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- retro pixel font -->
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+
+  <title>Zone Invaders</title>
   <style>
-    body {
-      background: #000;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      font-family: system-ui, sans-serif;
+    html, body {
+      height: 100%;
       margin: 0;
+      padding: 0;
+      font-family: 'Press Start 2P', monospace;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: #000;
+      overflow: hidden;
+    }
+    #gradientOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle, transparent 0%, #000 70%);
+      z-index: 0.5;
+      pointer-events: none;
+    }
+    #pageLoadFade {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: #000;
+      z-index: 10000;
+      opacity: 1;
+      transition: opacity 800ms ease-out;
+      pointer-events: none;
+    }
+    #pageLoadFade.fade-out {
+      opacity: 0;
+    }
+    #backgroundLayer {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      background: #000;
+      transition: background-color 0.5s ease;
+    }
+    #gradientOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(0, 0, 0, 1) 0%, rgba(0, 0, 0, 1) 15%, rgba(0, 0, 0, 0) 100%);
+      z-index: 10;
+      pointer-events: none;
+    }
+    #gameContainer {
+      position: relative;
+      width: 700px;
+      height: 700px;
+      max-width: 90vw;
+      max-height: 90vh;
+      z-index: 11;
+    }
+    canvas {
+      display: block;
+      background: transparent;
+      border: none;
+      width: 100%;
+      height: 100%;
+      box-sizing: border-box;
+      z-index: 1;
+    }
+    #introOverlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+      display: none;
+      border: none;
+      box-sizing: border-box;
+      pointer-events: auto;
+    }
+    .logo-zoom {
+      transform: scale(20) translateZ(1000px);
+      opacity: 0;
+      filter: brightness(0.5);
+      transition: transform 2.5s cubic-bezier(0.2, 0, 0.8, 1), 
+                  opacity 2s cubic-bezier(0.4, 0, 0.6, 1),
+                  filter 1.5s ease-in;
+    }
+    .dialogue-box {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(0,0,0,0.85);
+      border: 2px solid #fff;
+      padding: 25px;
+      color: #fff;
+      text-align: center;
+      min-width: 300px;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+    .dialogue-box.active {
+      opacity: 1;
+    }
+    .cursor {
+      display: inline-block;
+      width: 10px;
+      height: 16px;
+      background: #fff;
+      margin-left: 5px;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 1; }
+    }
+    .warning {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #f33;
+      font-size: 72px;
+      text-shadow: 0 0 10px #f33;
+      opacity: 0;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.5; }
+      50% { opacity: 1; }
+    }
+    .mission-text {
+      position: absolute;
+      top: 65%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      color: #f33;
+      font-size: 20px;
+      text-shadow: 0 0 10px #f33;
+      opacity: 0;
+      text-align: center;
+      white-space: nowrap;
+    }
+    
+    /* Background stars for menu */
+    .star {
+      position: absolute;
+      font-family: 'Courier New', monospace;
+      font-weight: bold;
+      animation: twinkle 3s infinite;
+      text-shadow: 0 0 4px currentColor;
+    }
+    @keyframes twinkle {
+      0%, 100% { opacity: 0.3; }
+      50% { opacity: 1; }
+    }
+    
+    /* Warning symbols for warning phase */
+    .bg-warning {
+      position: absolute;
+      color: #f33;
+      font-size: 48px;
+      opacity: 0.3;
+      animation: flash 1s infinite;
+      text-shadow: 0 0 20px #f33;
+    }
+    @keyframes flash {
+      0%, 100% { opacity: 0.1; }
+      50% { opacity: 0.5; }
+    }
+    
+    /* Red pulsing hue for warning phase */
+    @keyframes redPulse {
+      0%, 100% { background-color: rgba(255, 0, 0, 0.1); }
+      50% { background-color: rgba(255, 0, 0, 0.25); }
     }
   </style>
 </head>
 <body>
-  <h2>Game placeholder — coming soon</h2>
+  <!-- Page load fade overlay -->
+  <div id="pageLoadFade"></div>
+  
+  <div id="backgroundLayer"></div>
+  
+  <!-- Gradient overlay over background but under game window -->
+  <div id="gradientOverlay"></div>
+  
+  <div id="gameContainer">
+    <canvas id="game" width="700" height="700"></canvas>
+    <div id="introOverlay">
+      <div id="dialogueBox" class="dialogue-box">
+        <span id="dialogueText"></span>
+        <span id="cursor" class="cursor"></span>
+      </div>
+      <div id="warning" class="warning">⚠</div>
+      <div id="missionText" class="mission-text">ELIMINATE CODE ERRORS</div>
+    </div>
+  </div>
+  
+  <!-- Background Music -->
+  <audio id="bgMusic" loop>
+    <source src="audio/main_menu.mp3" type="audio/mpeg">
+    <source src="audio/main_menu.ogg" type="audio/ogg">
+    <source src="audio/main_menu.wav" type="audio/wav">
+  </audio>
+  
+  <!-- Sound Effects -->
+  <audio id="pauseSound" preload="auto">
+    <source src="audio/pause.mp3" type="audio/mpeg">
+  </audio>
+  
+  <audio id="unpauseSound" preload="auto">
+    <source src="audio/unpause.mp3" type="audio/mpeg">
+  </audio>
+  
+  <audio id="whooshSound" preload="auto">
+    <source src="audio/whoosh.mp3" type="audio/mpeg">
+  </audio>
+  
+  <audio id="digitalTypingSound" preload="auto">
+    <source src="audio/digital_typing.mp3" type="audio/mpeg">
+  </audio>
+  
+  <audio id="warning1Sound" preload="auto">
+    <source src="audio/warning1.mp3" type="audio/mpeg">
+  </audio>
+  
+  <audio id="warning2Sound" preload="auto">
+    <source src="audio/warning2.mp3" type="audio/mpeg">
+  </audio>
+  
+  <script type="module" src="src/menu.js"></script>
+  <script type="module" src="src/engine.js"></script>
+  <script>
+    // Page load fade-in effect
+    window.addEventListener('load', () => {
+      const fadeOverlay = document.getElementById('pageLoadFade');
+      if (fadeOverlay) {
+        // Small delay before starting fade
+        setTimeout(() => {
+          fadeOverlay.classList.add('fade-out');
+          // Remove overlay after fade completes
+          setTimeout(() => {
+            fadeOverlay.remove();
+          }, 800);
+        }, 100);
+      }
+    });
+    
+    // Music Manager with fade effects
+    const bgMusic = document.getElementById('bgMusic');
+    let isFading = false;
+    
+    // Start with volume at 0 for fade in
+    bgMusic.volume = 0;
+    
+    // Fade in music
+    function fadeIn(duration = 2000) {
+      if (isFading) return;
+      isFading = true;
+      
+      const targetVolume = 0.3; // Max volume (30%)
+      const steps = 60; // 60 steps for smooth fade
+      const stepTime = duration / steps;
+      const volumeIncrement = targetVolume / steps;
+      let currentStep = 0;
+      
+      const fadeInterval = setInterval(() => {
+        currentStep++;
+        bgMusic.volume = Math.min(volumeIncrement * currentStep, targetVolume);
+        
+        if (currentStep >= steps) {
+          clearInterval(fadeInterval);
+          isFading = false;
+        }
+      }, stepTime);
+    }
+    
+    // Fade out music
+    function fadeOut(duration = 1500) {
+      if (isFading) return;
+      isFading = true;
+      
+      const startVolume = bgMusic.volume;
+      const steps = 60;
+      const stepTime = duration / steps;
+      const volumeDecrement = startVolume / steps;
+      let currentStep = 0;
+      
+      const fadeInterval = setInterval(() => {
+        currentStep++;
+        bgMusic.volume = Math.max(startVolume - (volumeDecrement * currentStep), 0);
+        
+        if (currentStep >= steps) {
+          clearInterval(fadeInterval);
+          bgMusic.pause();
+          isFading = false;
+        }
+      }, stepTime);
+    }
+    
+    // Fade out and stop music completely (no looping)
+    function fadeOutAndStop(duration = 1500) {
+      if (isFading) return;
+      isFading = true;
+      
+      const startVolume = bgMusic.volume;
+      const steps = 60;
+      const stepTime = duration / steps;
+      const volumeDecrement = startVolume / steps;
+      let currentStep = 0;
+      
+      const fadeInterval = setInterval(() => {
+        currentStep++;
+        bgMusic.volume = Math.max(startVolume - (volumeDecrement * currentStep), 0);
+        
+        if (currentStep >= steps) {
+          clearInterval(fadeInterval);
+          bgMusic.pause();
+          bgMusic.currentTime = 0; // Reset to beginning
+          isFading = false;
+        }
+      }, stepTime);
+    }
+    
+    // Auto-play with user interaction (browsers require user gesture)
+    function startMusic() {
+      if (!bgMusic.paused) return; // Already playing
+      
+      bgMusic.play().then(() => {
+        fadeIn();
+        musicStarted = true;
+      }).catch(err => {
+        console.log('Autoplay prevented. Music will start on first interaction.');
+      });
+    }
+    
+    // Try to start music on page load
+    window.addEventListener('load', () => {
+      startMusic();
+    });
+    
+    // Fallback: start on first click/keypress if autoplay blocked
+    let musicStarted = false;
+    function tryStartMusic() {
+      if (!musicStarted && bgMusic.paused) {
+        startMusic();
+      }
+    }
+    
+    // Keep trying on interactions (don't use 'once')
+    document.addEventListener('click', tryStartMusic);
+    document.addEventListener('keydown', tryStartMusic);
+    document.addEventListener('touchstart', tryStartMusic);
+    
+    // Also expose globally so menu can trigger it
+    window.ensureMusicPlaying = startMusic;
+    
+    // Handle page visibility changes (pause when tab hidden)
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        fadeOut(500);
+      } else if (musicStarted) {
+        bgMusic.play().then(() => {
+          fadeIn(1000);
+        });
+      }
+    });
+    
+    // Export functions for other scripts to use
+    window.audioManager = {
+      fadeIn: fadeIn,
+      fadeOut: fadeOut,
+      fadeOutAndStop: fadeOutAndStop,
+      setVolume: (vol) => { bgMusic.volume = Math.max(0, Math.min(1, vol)); },
+      play: () => bgMusic.play(),
+      pause: () => bgMusic.pause(),
+      isPlaying: () => !bgMusic.paused,
+      
+      // Sound effects
+      playPause: () => {
+        const pauseSound = document.getElementById('pauseSound');
+        if (pauseSound) {
+          pauseSound.currentTime = 0;
+          pauseSound.volume = 0.5;
+          pauseSound.play().catch(() => {});
+        }
+      },
+      playUnpause: () => {
+        const unpauseSound = document.getElementById('unpauseSound');
+        if (unpauseSound) {
+          unpauseSound.currentTime = 0;
+          unpauseSound.volume = 0.5;
+          unpauseSound.play().catch(() => {});
+        }
+      },
+      playWhoosh: () => {
+        const whooshSound = document.getElementById('whooshSound');
+        if (whooshSound) {
+          whooshSound.currentTime = 0;
+          whooshSound.volume = 0.6;
+          whooshSound.play().catch(() => {});
+        }
+      },
+      playDigitalTyping: () => {
+        const digitalTypingSound = document.getElementById('digitalTypingSound');
+        if (digitalTypingSound) {
+          digitalTypingSound.currentTime = 0;
+          digitalTypingSound.volume = 0.5;
+          digitalTypingSound.play().catch(() => {});
+        }
+      }
+    };
+  </script>
 </body>
 </html>
