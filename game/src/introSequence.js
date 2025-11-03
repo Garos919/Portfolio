@@ -115,15 +115,17 @@ export class IntroSequence {
     // Exponential ease-in animation for logo zoom
     animateLogoZoom(titleContainer) {
         return new Promise(resolve => {
-            // Play whoosh sound and start fading out music at the start of the zoom
+            // Play whoosh sound at the start of the zoom
             if (window.audioManager && window.audioManager.playWhoosh) {
                 window.audioManager.playWhoosh();
             }
             
-            // Fade out and stop the main menu music
-            if (window.audioManager && window.audioManager.fadeOutAndStop) {
-                window.audioManager.fadeOutAndStop(2500); // Match animation duration
-            }
+            // Fade out music in the last 500ms of the animation (at 2000ms)
+            setTimeout(() => {
+                if (window.audioManager && window.audioManager.fadeOutAndStop) {
+                    window.audioManager.fadeOutAndStop(500);
+                }
+            }, 2000); // Start fade out at 2000ms (2500ms total - 500ms fade = 2000ms delay)
             
             const duration = 2500; // 2.5 seconds
             const startScale = 1;
@@ -450,6 +452,21 @@ export class IntroSequence {
     }
 
     async startGameplay() {
+        // Disable music from being restarted by click events
+        if (window.disableMusicRestart) {
+            window.disableMusicRestart();
+        }
+        
+        // Ensure music is stopped
+        if (window.audioManager) {
+            const bgMusic = document.getElementById('bgMusic');
+            if (bgMusic) {
+                bgMusic.pause();
+                bgMusic.currentTime = 0;
+                bgMusic.volume = 0;
+            }
+        }
+        
         // Transition background - remove red pulse, show code background
         if (this.bgController) {
             this.bgController.removeGameRedPulse();

@@ -97,6 +97,11 @@ export class Game {
             });
             b.addEventListener('mouseover', () => { b.style.background = '#022'; });
             b.addEventListener('mouseout', () => { b.style.background = '#111'; });
+            b.addEventListener('mouseenter', () => {
+                if (window.audioManager && window.audioManager.playHover) {
+                    window.audioManager.playHover();
+                }
+            });
             return b;
         };
 

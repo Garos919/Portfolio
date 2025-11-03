@@ -207,6 +207,10 @@ export class DeathScreen {
         });
 
         button.addEventListener("mouseenter", () => {
+            // Play hover sound
+            if (window.audioManager && window.audioManager.playHover) {
+                window.audioManager.playHover();
+            }
             button.style.backgroundImage = "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), linear-gradient(180deg, #fff 0%, #ddd 50%, #bbb 100%)";
             button.style.color = "#0ff";
             button.style.boxShadow = "0 4px 0 #088, 0 0 30px rgba(0,255,255,0.8)";

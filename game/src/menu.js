@@ -146,6 +146,10 @@ export function createMenu(startCallback) {
         position: "relative"
     });
     start.addEventListener("mouseenter", () => {
+        // Play hover sound
+        if (window.audioManager && window.audioManager.playHover) {
+            window.audioManager.playHover();
+        }
         start.style.backgroundImage = "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), linear-gradient(180deg, #fff 0%, #ddd 50%, #bbb 100%)";
         start.style.color = "#0ff";
         start.style.boxShadow = "0 4px 0 #088, 0 0 30px rgba(0,255,255,0.8)";
@@ -158,6 +162,11 @@ export function createMenu(startCallback) {
         start.style.transform = "translateY(0)";
     });
     start.addEventListener("click", async () => {
+        // Play explosion sound
+        if (window.audioManager && window.audioManager.playExplosion) {
+            window.audioManager.playExplosion();
+        }
+        
         // Disable both buttons to prevent double-click
         start.style.pointerEvents = 'none';
         exit.style.pointerEvents = 'none';
@@ -192,6 +201,10 @@ export function createMenu(startCallback) {
         position: "relative"
     });
     exit.addEventListener("mouseenter", () => {
+        // Play hover sound
+        if (window.audioManager && window.audioManager.playHover) {
+            window.audioManager.playHover();
+        }
         exit.style.backgroundImage = "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), linear-gradient(180deg, #fff 0%, #ddd 50%, #bbb 100%)";
         exit.style.color = "#f33";
         exit.style.boxShadow = "0 4px 0 #833, 0 0 30px rgba(255,51,51,0.8)";
@@ -204,15 +217,32 @@ export function createMenu(startCallback) {
         exit.style.transform = "translateY(0)";
     });
     exit.addEventListener("click", async () => {
+        // Play explosion sound and store reference
+        let explosionSound = null;
+        if (window.audioManager && window.audioManager.playExplosion) {
+            explosionSound = window.audioManager.playExplosion();
+        }
+        
+        // Fade out music
+        if (window.audioManager && window.audioManager.fadeOut) {
+            window.audioManager.fadeOut(1000);
+        }
+        
+        // Fade out explosion sound in the last 500ms
+        setTimeout(() => {
+            if (explosionSound && window.audioManager && window.audioManager.fadeOutSound) {
+                window.audioManager.fadeOutSound(explosionSound, 500);
+            }
+        }, 1000); // Start fade at 1000ms (1500ms total - 500ms fade = 1000ms delay)
+        
         // Disable both buttons to prevent double-click
         start.style.pointerEvents = 'none';
         exit.style.pointerEvents = 'none';
         
-        // Create fade overlay
-        const gameContainer = document.getElementById('gameContainer');
+        // Create fade overlay that covers entire viewport
         const fadeOverlay = document.createElement('div');
         Object.assign(fadeOverlay.style, {
-            position: 'absolute',
+            position: 'fixed',
             top: '0',
             left: '0',
             width: '100%',
@@ -220,10 +250,10 @@ export function createMenu(startCallback) {
             backgroundColor: '#000',
             opacity: '0',
             transition: 'opacity 500ms ease-in-out',
-            zIndex: '9999',
+            zIndex: '99999',
             pointerEvents: 'none'
         });
-        gameContainer.appendChild(fadeOverlay);
+        document.body.appendChild(fadeOverlay);
         
         // Start fade to black immediately
         setTimeout(() => {
@@ -239,7 +269,7 @@ export function createMenu(startCallback) {
         // Navigate after fade completes
         setTimeout(() => {
             window.location.href = "../home.html";
-        }, 500);
+        }, 1500);
     });
 
     menu.append(titleContainer, start, exit);

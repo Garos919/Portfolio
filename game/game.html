@@ -248,6 +248,14 @@
     <source src="audio/warning2.mp3" type="audio/mpeg">
   </audio>
   
+  <audio id="hoverSound" preload="auto">
+    <source src="audio/hover.mp3" type="audio/mpeg">
+  </audio>
+  
+  <audio id="explosionSound" preload="auto">
+    <source src="audio/explosion.mp3" type="audio/mpeg">
+  </audio>
+  
   <script type="module" src="src/menu.js"></script>
   <script type="module" src="src/engine.js"></script>
   <script>
@@ -269,27 +277,32 @@
     // Music Manager with fade effects
     const bgMusic = document.getElementById('bgMusic');
     let isFading = false;
+    let currentFadeInterval = null;
     
     // Start with volume at 0 for fade in
     bgMusic.volume = 0;
     
     // Fade in music
-    function fadeIn(duration = 2000) {
-      if (isFading) return;
+    function fadeIn(duration = 2000, targetVolume = 0.3) {
+      // Clear any existing fade
+      if (currentFadeInterval) {
+        clearInterval(currentFadeInterval);
+        currentFadeInterval = null;
+      }
       isFading = true;
       
-      const targetVolume = 0.3; // Max volume (30%)
       const steps = 60; // 60 steps for smooth fade
       const stepTime = duration / steps;
       const volumeIncrement = targetVolume / steps;
       let currentStep = 0;
       
-      const fadeInterval = setInterval(() => {
+      currentFadeInterval = setInterval(() => {
         currentStep++;
         bgMusic.volume = Math.min(volumeIncrement * currentStep, targetVolume);
         
         if (currentStep >= steps) {
-          clearInterval(fadeInterval);
+          clearInterval(currentFadeInterval);
+          currentFadeInterval = null;
           isFading = false;
         }
       }, stepTime);
@@ -297,7 +310,11 @@
     
     // Fade out music
     function fadeOut(duration = 1500) {
-      if (isFading) return;
+      // Clear any existing fade
+      if (currentFadeInterval) {
+        clearInterval(currentFadeInterval);
+        currentFadeInterval = null;
+      }
       isFading = true;
       
       const startVolume = bgMusic.volume;
@@ -306,12 +323,13 @@
       const volumeDecrement = startVolume / steps;
       let currentStep = 0;
       
-      const fadeInterval = setInterval(() => {
+      currentFadeInterval = setInterval(() => {
         currentStep++;
         bgMusic.volume = Math.max(startVolume - (volumeDecrement * currentStep), 0);
         
         if (currentStep >= steps) {
-          clearInterval(fadeInterval);
+          clearInterval(currentFadeInterval);
+          currentFadeInterval = null;
           bgMusic.pause();
           isFading = false;
         }
@@ -320,7 +338,11 @@
     
     // Fade out and stop music completely (no looping)
     function fadeOutAndStop(duration = 1500) {
-      if (isFading) return;
+      // Clear any existing fade
+      if (currentFadeInterval) {
+        clearInterval(currentFadeInterval);
+        currentFadeInterval = null;
+      }
       isFading = true;
       
       const startVolume = bgMusic.volume;
@@ -329,12 +351,13 @@
       const volumeDecrement = startVolume / steps;
       let currentStep = 0;
       
-      const fadeInterval = setInterval(() => {
+      currentFadeInterval = setInterval(() => {
         currentStep++;
         bgMusic.volume = Math.max(startVolume - (volumeDecrement * currentStep), 0);
         
         if (currentStep >= steps) {
-          clearInterval(fadeInterval);
+          clearInterval(currentFadeInterval);
+          currentFadeInterval = null;
           bgMusic.pause();
           bgMusic.currentTime = 0; // Reset to beginning
           isFading = false;
@@ -361,8 +384,10 @@
     
     // Fallback: start on first click/keypress if autoplay blocked
     let musicStarted = false;
+    let allowMusicRestart = true; // New flag to control whether music can be restarted
+    
     function tryStartMusic() {
-      if (!musicStarted && bgMusic.paused) {
+      if (!musicStarted && bgMusic.paused && allowMusicRestart) {
         startMusic();
       }
     }
@@ -375,11 +400,16 @@
     // Also expose globally so menu can trigger it
     window.ensureMusicPlaying = startMusic;
     
+    // Expose function to disable music restart
+    window.disableMusicRestart = () => {
+      allowMusicRestart = false;
+    };
+    
     // Handle page visibility changes (pause when tab hidden)
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         fadeOut(500);
-      } else if (musicStarted) {
+      } else if (musicStarted && allowMusicRestart) {
         bgMusic.play().then(() => {
           fadeIn(1000);
         });
@@ -428,6 +458,44 @@
           digitalTypingSound.volume = 0.5;
           digitalTypingSound.play().catch(() => {});
         }
+      },
+      playHover: () => {
+        const hoverSound = document.getElementById('hoverSound');
+        if (hoverSound) {
+          hoverSound.currentTime = 0;
+          hoverSound.volume = 0.3;
+          hoverSound.play().catch(() => {});
+        }
+      },
+      playExplosion: () => {
+        const explosionSound = document.getElementById('explosionSound');
+        if (explosionSound) {
+          explosionSound.currentTime = 0;
+          explosionSound.volume = 0.5;
+          explosionSound.play().catch(() => {});
+          return explosionSound;
+        }
+        return null;
+      },
+      fadeOutSound: (audioElement, duration) => {
+        if (!audioElement) return;
+        const startVolume = audioElement.volume;
+        const startTime = Date.now();
+        
+        const fade = () => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min(elapsed / duration, 1);
+          audioElement.volume = startVolume * (1 - progress);
+          
+          if (progress < 1) {
+            requestAnimationFrame(fade);
+          } else {
+            audioElement.pause();
+            audioElement.currentTime = 0;
+          }
+        };
+        
+        requestAnimationFrame(fade);
       }
     };
   </script>

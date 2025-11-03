@@ -222,6 +222,16 @@
     <source src="game/audio/under-construction.mp3" type="audio/mpeg">
   </audio>
   
+  <!-- Hover sound -->
+  <audio id="hoverSound" preload="auto">
+    <source src="game/audio/hover2.mp3" type="audio/mpeg">
+  </audio>
+  
+  <!-- Mass explosion sound -->
+  <audio id="massExplosionSound" preload="auto">
+    <source src="game/audio/mass--explosion.mp3" type="audio/mpeg">
+  </audio>
+  
   <!-- Fade overlay for transitions -->
   <div id="fadeOverlay"></div>
   
@@ -289,6 +299,20 @@
           fadeOverlay.classList.add('fade-out');
           // Don't remove overlay - we'll reuse it for button click
         }, 100);
+      }
+    });
+    
+    // Handle browser back/forward button (bfcache)
+    window.addEventListener('pageshow', (event) => {
+      if (event.persisted) {
+        // Page was loaded from cache (back/forward button)
+        console.log('Page restored from cache, resetting...');
+        const fadeOverlay = document.getElementById('fadeOverlay');
+        if (fadeOverlay) {
+          fadeOverlay.classList.remove('active');
+          fadeOverlay.classList.add('fade-out');
+        }
+        startMusic();
       }
     });
     
@@ -369,8 +393,49 @@
     
     // Flash effect for button click
     const gameButton = document.querySelector('.game-button');
+    
+    // Add hover sound
+    const hoverSound = document.getElementById('hoverSound');
+    gameButton.addEventListener('mouseenter', () => {
+      if (hoverSound) {
+        hoverSound.currentTime = 0;
+        hoverSound.volume = 0.3;
+        hoverSound.play().catch(e => {});
+      }
+    });
+    
     gameButton.addEventListener('click', (e) => {
       e.preventDefault();
+      
+      // Play mass explosion sound
+      const massExplosionSound = document.getElementById('massExplosionSound');
+      if (massExplosionSound) {
+        massExplosionSound.currentTime = 0;
+        massExplosionSound.volume = 0.5;
+        massExplosionSound.play().catch(e => {});
+        
+        // Fade out explosion sound in the last 500ms
+        setTimeout(() => {
+          const startVolume = massExplosionSound.volume;
+          const startTime = Date.now();
+          const fadeDuration = 500;
+          
+          const fade = () => {
+            const elapsed = Date.now() - startTime;
+            const progress = Math.min(elapsed / fadeDuration, 1);
+            massExplosionSound.volume = startVolume * (1 - progress);
+            
+            if (progress < 1) {
+              requestAnimationFrame(fade);
+            } else {
+              massExplosionSound.pause();
+              massExplosionSound.currentTime = 0;
+            }
+          };
+          
+          requestAnimationFrame(fade);
+        }, 2000); // Start fade at 2000ms (2500ms total - 500ms fade = 2000ms delay)
+      }
       
       // Get button position
       const rect = gameButton.getBoundingClientRect();
@@ -432,7 +497,7 @@
       // Navigate after delay (sync with fade duration)
       setTimeout(() => {
         window.location.href = 'game/game.html';
-      }, 500);
+      }, 2500);
     });
     
     // Coding symbols for stars
