@@ -53,23 +53,39 @@ export class Player {
         let shipColor = "#fff";
         let shipOpacity = 1;
         
-        // Bug Squasher - green outline
-        if (powerUps && powerUps.isActive('bugSquasher')) {
+        // Flash effect when invulnerable (hit damage)
+        if (this.invulnerable > 0) {
+            // Fast flash animation - alternates between white and transparent
+            const flashSpeed = 6; // Frames between flashes
+            const flashPhase = Math.floor(this.invulnerable / flashSpeed) % 2;
+            
+            if (flashPhase === 0) {
+                shipColor = "#fff";
+                shipOpacity = 1;
+                ctx.shadowColor = "#fff";
+                ctx.shadowBlur = 30;
+            } else {
+                shipOpacity = 0.3;
+            }
+        }
+        
+        // Bug Squasher - green outline (override flash color if active)
+        if (powerUps && powerUps.isActive('bugSquasher') && this.invulnerable === 0) {
             shipColor = "#0f0";
             ctx.shadowColor = "#0f0";
             ctx.shadowBlur = 20;
         }
         
-        // Incognito - reduced opacity
-        if (powerUps && powerUps.isActive('incognito')) {
+        // Incognito - reduced opacity (override flash opacity if active)
+        if (powerUps && powerUps.isActive('incognito') && this.invulnerable === 0) {
             shipOpacity = 0.4;
             shipColor = "#0ff";
             ctx.shadowColor = "#0ff";
             ctx.shadowBlur = 15;
         }
         
-        // Overclock - red glow
-        if (powerUps && powerUps.isActive('overclock')) {
+        // Overclock - red glow (can combine with flash)
+        if (powerUps && powerUps.isActive('overclock') && this.invulnerable === 0) {
             ctx.shadowColor = "#f00";
             ctx.shadowBlur = 25;
         }

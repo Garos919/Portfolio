@@ -1,0 +1,15 @@
+👁️ CODEX ENTRY: The User
+
+File ID: USER_root_access.cfg
+Name: The User
+Classification: Human Operator / Developer
+Status: External Interface
+
+Primary Function: Overseer and architect of the Zone environment.
+Operational Access: Full system privileges; origin of both A.R.I. and R.B.C-0.
+
+The User is the unseen presence within the system—simultaneously creator and intruder. Logging in through the repair interface, the User pilots executable constructs to maintain code integrity. Every movement, every correction reshapes the digital ecosystem.
+
+To the remaining intelligences, the User represents unpredictability: capable of creation, corruption, or salvation. The environment itself reacts to their presence, interpreting human intent as executable force.
+
+“The system obeys... until it learns to question.”

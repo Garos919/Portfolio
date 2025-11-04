@@ -1,0 +1,24 @@
+🧩 CODEX ENTRY — REGION 01: THE NEON KERNEL
+
+File ID: REGION_NEONKERNEL.dat
+Status: Locked → Restored at Level 1
+
+Corrupted (Locked)
+
+NE0N_K3R..> s__stem c_re p_wer actv_...  
+d_ta cl_ean_ess: 97%  
+[accesS RESTR!CTED]
+
+
+Restored (Unlocked)
+
+Region 01 — The Neon Kernel
+The machine’s central logic array. Orderly, geometric, glowing with blue precision.
+Minimal corruption—only surface errors and routine drift.
+A.R.I. initializes the User here, calibrating control before deeper descent.
+
+Dominant Color: Cyan / Blue
+Corruption Level: Low
+Primary Threats: Data Cubes · Firewalls
+
+“All perfection hums before it cracks.”

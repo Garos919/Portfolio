@@ -1,0 +1,12 @@
+🧩 CODEX ENTRY: STACK CRAWLER
+
+File ID: ENM_STACKCRAWLER.seg
+Region: Verdant Overflow (Mid-boss)
+Status: Segmented anomaly
+
+Primary Function: Stack reconstruction.
+Failure Mode: Infinite recursion.
+
+A chain of self-referencing subroutines that feed on their own call stack. Each destroyed segment re-spawns as a smaller, faster instance. The only end to the recursion is total deletion.
+
+“Cut off one frame, two return.”

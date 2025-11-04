@@ -1,0 +1,4 @@
+# [coderfly_action_loop]
+
+coderfly_1:   ⸌(•)⸍      // wings open
+coderfly_2:   ⸍(•)⸌      // wings tilt inward  #[loop]

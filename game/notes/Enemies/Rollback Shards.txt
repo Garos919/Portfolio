@@ -1,0 +1,12 @@
+💥 CODEX ENTRY: ROLLBACK SHARDS
+
+File ID: ENM_RBSHARD.dmp
+Region: Crimson Terminal
+Status: Residual fragment
+
+Primary Function: Rollback checkpoint data.
+Failure Mode: Explosive duplication.
+
+When the Rollback Compiler failed, fragments of its restore points scattered across the terminal layer. These Shards replay the final milliseconds of destroyed code before detonating, creating localized reversions in time.
+
+“Every explosion is the past refusing to stay deleted.”

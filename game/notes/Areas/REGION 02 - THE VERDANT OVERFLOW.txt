@@ -1,0 +1,24 @@
+🧬 CODEX ENTRY — REGION 02: THE VERDANT OVERFLOW
+
+File ID: REGION_OVERFLOW.tmp
+Status: Locked → Restored at Level 5
+
+Corrupted (Locked)
+
+OV3R_FL0W.. mem recursion++  
+cleanr pr0ces?—failed()  
+###[DATA LEAK DETECTED]###
+
+
+Restored (Unlocked)
+
+Region 02 — The Verdant Overflow
+Once a maintenance loop, now an ecosystem of self-replicating bugs.
+Broken cleanup scripts sprout endless green processes feeding on leftover data.
+The air itself feels heavy with static and growth.
+
+Dominant Color: Toxic Green
+Corruption Level: High
+Primary Threats: Corrupt Pointers · ASCII Clouds
+
+“Where code was meant to recycle, it began to bloom.”

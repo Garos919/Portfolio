@@ -1,0 +1,12 @@
+🔥 CODEX ENTRY: FIREWALLS
+
+File ID: ENM_FIREWALL.sys
+Region: Neon Kernel
+Status: Fragmented
+
+Primary Function: Defensive barriers controlling data flow.
+Failure Mode: Aggressive loop-activation.
+
+Originally designed to shield key sectors from intrusion, Firewalls now trigger endlessly, projecting energy lines that burn through stable memory. Their protective protocol no longer distinguishes between friend and threat.
+
+“Security becomes violence when it forgets who it protects.”

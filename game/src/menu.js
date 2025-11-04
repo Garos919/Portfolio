@@ -126,6 +126,19 @@ export function createMenu(startCallback) {
 
     titleContainer.append(zone, invaders);
 
+    // Version display under title
+    const versionDisplay = document.createElement("div");
+    versionDisplay.textContent = "v0.5.7";
+    Object.assign(versionDisplay.style, {
+        fontFamily: "'Press Start 2P', monospace",
+        fontSize: "10px",
+        color: "rgba(0, 255, 255, 0.3)",
+        textAlign: "center",
+        marginTop: "15px",
+        letterSpacing: "2px"
+    });
+    titleContainer.appendChild(versionDisplay);
+
     const start = document.createElement("button");
     start.textContent = "Start Game";
     Object.assign(start.style, {
@@ -161,25 +174,7 @@ export function createMenu(startCallback) {
         start.style.boxShadow = "0 4px 0 #088, 0 0 20px rgba(0,255,255,0.5)";
         start.style.transform = "translateY(0)";
     });
-    start.addEventListener("click", async () => {
-        // Play explosion sound
-        if (window.audioManager && window.audioManager.playExplosion) {
-            window.audioManager.playExplosion();
-        }
-        
-        // Disable both buttons to prevent double-click
-        start.style.pointerEvents = 'none';
-        exit.style.pointerEvents = 'none';
-        
-        // Explode both buttons simultaneously
-        await Promise.all([
-            animateButtonBreak(start),
-            animateButtonBreak(exit)
-        ]);
-        
-        // Pass the start button and title container to the callback so the intro can animate them.
-        startCallback(start, titleContainer, menu, bgController);
-    });
+    // Click handler will be added after skipIntro button is created
 
     const exit = document.createElement("button");
     exit.textContent = "Exit";
@@ -216,12 +211,106 @@ export function createMenu(startCallback) {
         exit.style.boxShadow = "0 4px 0 #833, 0 0 20px rgba(255,51,51,0.5)";
         exit.style.transform = "translateY(0)";
     });
+    // Click handler will be added after skipIntro button is created
+
+    // Skip Intro button - go straight to game without intro sequence
+    const skipIntro = document.createElement("button");
+    skipIntro.textContent = "Start Game (No Intro)";
+    Object.assign(skipIntro.style, {
+        backgroundImage: "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), linear-gradient(180deg, #fa0 0%, #d90 50%, #b70 100%)",
+        border: "2px solid #d90",
+        color: "#000",
+        fontFamily: "'Press Start 2P', monospace",
+        fontWeight: "normal",
+        padding: "15px 30px",
+        borderRadius: "0",
+        cursor: "pointer",
+        marginTop: "10px",
+        fontSize: "12px",
+        boxShadow: "0 4px 0 #860, 0 0 20px rgba(255,170,0,0.5)",
+        textShadow: "1px 1px 0 rgba(0,0,0,0.3)",
+        imageRendering: "pixelated",
+        transition: "all 0.1s ease",
+        position: "relative"
+    });
+    skipIntro.addEventListener("mouseenter", () => {
+        if (window.audioManager && window.audioManager.playHover) {
+            window.audioManager.playHover();
+        }
+        skipIntro.style.backgroundImage = "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), linear-gradient(180deg, #fff 0%, #ddd 50%, #bbb 100%)";
+        skipIntro.style.color = "#fa0";
+        skipIntro.style.boxShadow = "0 4px 0 #860, 0 0 30px rgba(255,170,0,0.8)";
+        skipIntro.style.transform = "translateY(-2px)";
+    });
+    skipIntro.addEventListener("mouseleave", () => {
+        skipIntro.style.backgroundImage = "repeating-linear-gradient(0deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), repeating-linear-gradient(90deg, transparent, transparent 1px, rgba(0,0,0,0.1) 1px, rgba(0,0,0,0.1) 2px), linear-gradient(180deg, #fa0 0%, #d90 50%, #b70 100%)";
+        skipIntro.style.color = "#000";
+        skipIntro.style.boxShadow = "0 4px 0 #860, 0 0 20px rgba(255,170,0,0.5)";
+        skipIntro.style.transform = "translateY(0)";
+    });
+    skipIntro.addEventListener("click", async () => {
+        // Play explosion sound
+        if (window.audioManager && window.audioManager.playExplosion) {
+            window.audioManager.playExplosion();
+        }
+        
+        // Fade out version display
+        versionDisplay.style.transition = 'opacity 300ms ease-out';
+        versionDisplay.style.opacity = '0';
+        
+        // Disable all buttons to prevent double-click
+        start.style.pointerEvents = 'none';
+        skipIntro.style.pointerEvents = 'none';
+        exit.style.pointerEvents = 'none';
+        
+        // Explode all three buttons simultaneously
+        await Promise.all([
+            animateButtonBreak(start),
+            animateButtonBreak(skipIntro),
+            animateButtonBreak(exit)
+        ]);
+        
+        // Skip intro completely - pass null values to trigger direct game start
+        startCallback(null, null, menu, bgController);
+    });
+
+    // Now add click handlers for Start and Exit buttons (after skipIntro is created)
+    start.addEventListener("click", async () => {
+        // Play explosion sound
+        if (window.audioManager && window.audioManager.playExplosion) {
+            window.audioManager.playExplosion();
+        }
+        
+        // Fade out version display
+        versionDisplay.style.transition = 'opacity 300ms ease-out';
+        versionDisplay.style.opacity = '0';
+        
+        // Disable all buttons to prevent double-click
+        start.style.pointerEvents = 'none';
+        skipIntro.style.pointerEvents = 'none';
+        exit.style.pointerEvents = 'none';
+        
+        // Explode all three buttons simultaneously
+        await Promise.all([
+            animateButtonBreak(start),
+            animateButtonBreak(skipIntro),
+            animateButtonBreak(exit)
+        ]);
+        
+        // Pass the start button and title container to the callback so the intro can animate them.
+        startCallback(start, titleContainer, menu, bgController);
+    });
+
     exit.addEventListener("click", async () => {
         // Play explosion sound and store reference
         let explosionSound = null;
         if (window.audioManager && window.audioManager.playExplosion) {
             explosionSound = window.audioManager.playExplosion();
         }
+        
+        // Fade out version display
+        versionDisplay.style.transition = 'opacity 300ms ease-out';
+        versionDisplay.style.opacity = '0';
         
         // Fade out music
         if (window.audioManager && window.audioManager.fadeOut) {
@@ -235,8 +324,9 @@ export function createMenu(startCallback) {
             }
         }, 1000); // Start fade at 1000ms (1500ms total - 500ms fade = 1000ms delay)
         
-        // Disable both buttons to prevent double-click
+        // Disable all buttons to prevent double-click
         start.style.pointerEvents = 'none';
+        skipIntro.style.pointerEvents = 'none';
         exit.style.pointerEvents = 'none';
         
         // Create fade overlay that covers entire viewport
@@ -260,9 +350,10 @@ export function createMenu(startCallback) {
             fadeOverlay.style.opacity = '1';
         }, 10);
         
-        // Explode both buttons simultaneously (non-blocking)
+        // Explode all three buttons simultaneously (non-blocking)
         Promise.all([
             animateButtonBreak(start),
+            animateButtonBreak(skipIntro),
             animateButtonBreak(exit)
         ]);
         
@@ -272,6 +363,6 @@ export function createMenu(startCallback) {
         }, 1500);
     });
 
-    menu.append(titleContainer, start, exit);
+    menu.append(titleContainer, start, skipIntro, exit);
     gameContainer.appendChild(menu);
 }

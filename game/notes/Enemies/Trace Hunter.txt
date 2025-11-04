@@ -1,0 +1,12 @@
+⚙️ CODEX ENTRY: TRACE HUNTER
+
+File ID: ENM_TRACEHUNT.proc
+Region: Neon Kernel (L4 encounter)
+Status: Anomalous
+
+Primary Function: Debug tracing utility.
+Failure Mode: Recursive pursuit behavior.
+
+A former diagnostic process that records execution paths for error tracking. Once infected, it began following its own traces—hunting whatever moves like it. The Hunter mirrors the User’s trajectory with a delay, predicting movement by replaying recorded frames.
+
+“It doesn’t chase you. It chases the version of you that already moved.”

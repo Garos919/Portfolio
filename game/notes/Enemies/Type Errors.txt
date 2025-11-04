@@ -1,0 +1,14 @@
+🧮 CODEX ENTRY: TYPE ERRORS
+
+File ID: ERR_TYPE.cast
+Region: The Neon Kernel → The Verdant Overflow
+Status: Common
+
+Primary Function: Variable assignment integrity.
+Failure Mode: Value corruption.
+
+Originally system type-checkers, these entities now “convert” anything they touch into unstable data. They can cause temporary distortions in nearby enemies, forcing harmless fragments to mutate into higher-tier forms.
+
+Their surfaces shimmer between data types (int, float, bool) as they fluctuate violently.
+
+“When meaning shifts too fast, everything breaks.”

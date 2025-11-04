@@ -393,39 +393,78 @@ export class BackgroundController {
         // Only update if score actually changed
         if (this.lastScore === score) return;
         
-        // Check if we've reached a new +5 milestone
-        const currentMilestone = Math.floor(score / 5);
-        const lastMilestone = Math.floor(this.lastScore / 5);
+        // Check if we've reached a new +2 milestone (forward) or lost a -2 milestone (backward)
+        const currentMilestone = Math.floor(score / 2);
+        const lastMilestone = Math.floor(this.lastScore / 2);
+        
+        const milestoneDiff = currentMilestone - lastMilestone;
         
         this.lastScore = score;
         
-        // Only fix an error if we've crossed a +5 boundary
-        if (currentMilestone > lastMilestone) {
+        // If we've crossed a +2 boundary forward, fix errors
+        if (milestoneDiff > 0) {
             const codeContainer = document.getElementById('codeBackground');
             if (codeContainer) {
-                // Get all lines that still have errors
-                const errorLines = Array.from(codeContainer.querySelectorAll('.code-line'))
-                    .filter(line => line.dataset.hasError === 'true');
-                
-                // If there are errors left to fix, pick one randomly
-                if (errorLines.length > 0) {
-                    const randomIndex = Math.floor(Math.random() * errorLines.length);
-                    const line = errorLines[randomIndex];
+                // Fix one error per milestone crossed
+                for (let i = 0; i < milestoneDiff; i++) {
+                    // Get all lines that still have errors
+                    const errorLines = Array.from(codeContainer.querySelectorAll('.code-line'))
+                        .filter(line => line.dataset.hasError === 'true');
                     
-                    // Keep line number
-                    const lineNum = line.querySelector('span');
-                    line.innerHTML = '';
-                    line.appendChild(lineNum);
+                    // If there are errors left to fix, pick one randomly
+                    if (errorLines.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * errorLines.length);
+                        const line = errorLines[randomIndex];
+                        
+                        // Keep line number
+                        const lineNum = line.querySelector('span');
+                        line.innerHTML = '';
+                        line.appendChild(lineNum);
+                        
+                        // Replace error with correct syntax
+                        const template = this.codeTemplates[Math.floor(Math.random() * this.codeTemplates.length)];
+                        const codeSpan = document.createElement('span');
+                        codeSpan.textContent = template.text;
+                        codeSpan.style.color = template.color;
+                        line.appendChild(codeSpan);
+                        
+                        line.dataset.hasError = 'false';
+                        line.dataset.wasError = 'true'; // Track that it was fixed
+                    }
+                }
+            }
+        }
+        // If we've crossed a -2 boundary backward, corrupt lines
+        else if (milestoneDiff < 0) {
+            const codeContainer = document.getElementById('codeBackground');
+            if (codeContainer) {
+                // Corrupt one line per milestone lost
+                for (let i = 0; i < Math.abs(milestoneDiff); i++) {
+                    // Get all lines that are currently correct code
+                    const correctLines = Array.from(codeContainer.querySelectorAll('.code-line'))
+                        .filter(line => line.dataset.hasError === 'false');
                     
-                    // Replace error with correct syntax
-                    const template = this.codeTemplates[Math.floor(Math.random() * this.codeTemplates.length)];
-                    const codeSpan = document.createElement('span');
-                    codeSpan.textContent = template.text;
-                    codeSpan.style.color = template.color;
-                    line.appendChild(codeSpan);
-                    
-                    line.dataset.hasError = 'false';
-                    line.dataset.wasError = 'true'; // Track that it was fixed
+                    // If there are correct lines, pick one randomly to break
+                    if (correctLines.length > 0) {
+                        const randomIndex = Math.floor(Math.random() * correctLines.length);
+                        const line = correctLines[randomIndex];
+                        
+                        // Keep line number
+                        const lineNum = line.querySelector('span');
+                        line.innerHTML = '';
+                        line.appendChild(lineNum);
+                        
+                        // Replace with error syntax
+                        const errorText = this.errorTemplates[Math.floor(Math.random() * this.errorTemplates.length)];
+                        const errorSpan = document.createElement('span');
+                        errorSpan.textContent = errorText;
+                        errorSpan.style.color = '#f33';
+                        errorSpan.style.textDecoration = 'underline wavy #f33';
+                        errorSpan.style.textDecorationSkipInk = 'none';
+                        line.appendChild(errorSpan);
+                        
+                        line.dataset.hasError = 'true';
+                    }
                 }
             }
         }

@@ -1,0 +1,12 @@
+💢 CODEX ENTRY: NULL EXCEPTIONS
+
+File ID: ERR_NULLEX.ref
+Region: The Verdant Overflow
+Status: Viral
+
+Primary Function: Null reference handler.
+Failure Mode: Referential void propagation.
+
+Each Null Exception is a failed pointer that references nothing but refuses to accept its emptiness. These entities expand and collapse, pulling nearby code into temporary blackouts. They are common precursors to Corrupt Pointers, leaving dark voids in their wake.
+
+“Nothing doesn’t stay nothing for long.”

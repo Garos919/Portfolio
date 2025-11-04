@@ -1,0 +1,38 @@
+# [meta_timing]
+
+fps:			4			# slower, cinematic pace (~1s per 4-frame transition)
+frame_delay_short:	200ms		# micro motions (blink / talk)
+frame_delay_medium:	250ms		# emotional transitions (4 frames ≈ 1s)
+frame_delay_long:	300ms		# heavy system transitions
+loop_speed_fast:	300ms		# processing / scan / glitch_loop
+loop_speed_normal:	500ms
+loop_speed_slow:	800ms
+idle_variation_delay:	8000ms		# idle micro-loop interval (~8s)
+
+
+# [engine_category_map]
+
+# defines which loops or overlays are allowed to combine with which state types
+
+emotional_state:
+  overlays_allowed:	[blink, talk, talk_glitch, idle, load]
+  overlays_blocked:	[glitch_loop, error_flash, scan_flash]
+
+system_state:
+  overlays_allowed:	[data_in, data_out, ping, processing, scan_flash, error_flash]
+  overlays_blocked:	[talk, blink]
+
+action_loops:
+  independent:		[processing, scan, scan_flash, glitch_loop, error_flash]
+  dependent:		[talk, talk_glitch, blink, idle, load]
+
+transitions:
+  frame_rate:		fps
+  entry_length:		4frames
+  loop_behavior:	stop_on_[enter_state]
+
+# behavior notes
+# - blink and talk can overlay any emotional state except when system_state active
+# - glitch_loop and error_flash override all other expressions while active
+# - system_feedback loops (data_in/out/ping) run independently, non-blocking
+# - transitions disable loops until [enter_state] reached

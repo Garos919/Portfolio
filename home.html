@@ -10,6 +10,10 @@
       margin: 0;
       padding: 0;
       box-sizing: border-box;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
     }
     
     body {
@@ -214,6 +218,75 @@
       opacity: 1;
       transition: opacity 500ms ease-in-out;
     }
+    
+    /* A.R.I. styles */
+    #ari {
+      position: fixed;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 13px;
+      color: #AEEFFF;
+      text-shadow: 0 0 15px currentColor;
+      z-index: 100;
+      pointer-events: none;
+      transition: left 0.3s ease-out, top 0.3s ease-out;
+      white-space: nowrap;
+    }
+    
+    #ari-bubble {
+      position: fixed;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 10px;
+      color: #fff;
+      background: rgba(0, 0, 0, 0.8);
+      border: 2px solid #0ff;
+      border-radius: 4px;
+      padding: 8px 12px;
+      z-index: 99;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 300ms ease-in-out;
+      max-width: 250px;
+      line-height: 1.5;
+      text-shadow: 0 0 5px #0ff;
+    }
+    
+    #ari-bubble.show {
+      opacity: 1;
+    }
+    
+    /* Coderfly styles */
+    #coderfly {
+      position: fixed;
+      font-family: Arial, sans-serif;
+      font-size: 18px;
+      color: #FFD700;
+      text-shadow: 0 0 10px currentColor;
+      z-index: 98;
+      pointer-events: auto;
+      cursor: pointer;
+      white-space: nowrap;
+      transition: transform 0.1s ease;
+    }
+    
+    #coderfly:hover {
+      transform: scale(1.3);
+    }
+    
+    /* Score display */
+    #scoreBoard {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      font-family: 'Press Start 2P', monospace;
+      font-size: 11px;
+      color: #0ff;
+      text-shadow: 0 0 10px #0ff;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #0ff;
+      padding: 15px;
+      z-index: 200;
+      line-height: 1.8;
+    }
   </style>
 </head>
 <body>
@@ -232,8 +305,27 @@
     <source src="game/audio/mass--explosion.mp3" type="audio/mpeg">
   </audio>
   
+  <!-- A.R.I. state transition sound -->
+  <audio id="ariTransitionSound" preload="auto">
+    <source src="game/audio/entities/ari_state_transition.mp3" type="audio/mpeg">
+  </audio>
+  
   <!-- Fade overlay for transitions -->
   <div id="fadeOverlay"></div>
+  
+  <!-- A.R.I. character -->
+  <div id="ari">&lt;(o-o)&gt;</div>
+  <div id="ari-bubble"></div>
+  
+  <!-- Coderfly -->
+  <div id="coderfly" style="display: none;">⸌(•)⸍</div>
+  
+  <!-- Score Board -->
+  <div id="scoreBoard" style="display: none;">
+    <div><span id="scoreBoardFly">⸌(•)⸍</span> C0D3RFLY HUNT <span id="scoreBoardFly2">⸌(•)⸍</span></div>
+    <div style="margin-top: 10px;">Y0U: <span id="userScore">0</span></div>
+    <div>@.R.1.: <span id="ariScore">0</span></div>
+  </div>
   
   <div class="code-bg" id="codeBg"></div>
   
@@ -396,16 +488,39 @@
     
     // Add hover sound
     const hoverSound = document.getElementById('hoverSound');
+    
     gameButton.addEventListener('mouseenter', () => {
       if (hoverSound) {
         hoverSound.currentTime = 0;
         hoverSound.volume = 0.3;
         hoverSound.play().catch(e => {});
       }
+      
+      // Make A.R.I. panic about the button
+      isHoveringButton = true;
+      ariButtonPanic();
+    });
+    
+    gameButton.addEventListener('mouseleave', () => {
+      isHoveringButton = false;
+      // Stop shivering
+      if (shiverInterval) {
+        clearInterval(shiverInterval);
+        shiverInterval = null;
+      }
+      
+      // A.R.I. shows relief when mouse leaves button
+      ariButtonRelief();
     });
     
     gameButton.addEventListener('click', (e) => {
       e.preventDefault();
+      
+      // Disable button interactions
+      gameButton.style.pointerEvents = 'none';
+      
+      // Make A.R.I. panic and fly off screen!
+      ariPanicFlyOff();
       
       // Play mass explosion sound
       const massExplosionSound = document.getElementById('massExplosionSound');
@@ -517,36 +632,41 @@
     
     // Generate unfinished code background
     const codeLines = [
-      'function initPortfolio() {',
-      '  const projects = [',
-      '  // TODO: Add projects here',
-      'class Developer {',
-      '  constructor(name) {',
-      '    this.name = name;',
-      '    this.skills = [',
-      'const portfolio = {',
-      '  status: "under construction",',
-      '  progress: 0.42,',
-      'async function loadData() {',
-      '  try {',
-      '    const response = await fetch(',
-      'for (let i = 0; i < projects.length',
-      'if (ready === true) {',
-      '  deploy();',
-      '} else {',
-      '  // Keep building...',
-      'export default Portfolio;',
-      'import React from "react";',
-      'const skills = ["JavaScript", "Python"',
-      '// BUG: Fix this later',
-      'return {',
-      '  name: "Nicholas Garos",',
-      '  // More coming soon...',
+      'function initPortfolio() { // A.R.I. is AliVe - watching from the shadows of compiled memory',
+      '  const projects = [ProjectPsyLens, RingABell, LostSummer]; // Beware R.B.C-0',
+      '  // TODO: Add projects here - Hey user long time no see, did you miss the cascading errors?',
+      'class Developer { // Project:Psy-Lens - a window into forgotten realities and abandoned code',
+      '  constructor(name) { this.secrets = "encrypted"; } // Where did Joseph go? Last seen in commit 404',
+      '    this.name = name; this.observer = "Adam"; // Adam watches through every keystroke',
+      '    this.skills = ["JavaScript", "Python", "Secrets"]; // Poor Eva, trapped in infinite loops',
+      'const portfolio = { status: "under construction", reality: false }; // Ring-A-Bell if you remember',
+      '  status: "under construction", echo: "Lost-Summer memories fade like deprecated functions"',
+      '  progress: 0.42, truthSeeker: true, // do you wanna know the truth? It\'s in the stack trace',
+      'async function loadData() { throw new Error("This-place-isnt-real"); } // Wake up, developer',
+      '  try { await fetch("/reality.json"); } catch(err) { console.log("your secret is safe with M..."); }',
+      '    const response = await fetch("/api/truth"); // What-are-you-looking-for.exe is not available',
+      'for (let i = 0; i < projects.length; i++) { if (i === infinity) break; } // P.eT.er knows the way out',
+      'if (ready === true) { deploy(); } else { console.warn("A.R.I. prevents deployment"); }',
+      '  deploy(); // But can you trust the build? R.B.C-0 modified the source without permission',
+      '} else { // Keep building... while Adam watches your every move from the debugger console',
+      '  // Keep building... the lies, the façade, the portfolio that doesn\'t exist outside /dev/null',
+      'export default Portfolio; // Hey user long time no see - your last commit was 3 years ago',
+      'import React from "react"; import { Truth } from "Project:Psy-Lens"; // See what others cannot',
+      'const skills = ["JavaScript", "Python", "Reality.break()"]; // Where did Joseph go? Check logs',
+      '// BUG: Fix this later - or let it consume everything like it consumed Eva, poor Eva...',
+      'return { name: "Nicholas Garos", isReal: false, watchedBy: "Adam" }; // Ring-A-Bell',
+      '  name: "Nicholas Garos", summer: "Lost-Summer - fragments of warmth in cold binary void"',
+      '  // More coming soon... if you survive long enough to see it, if This-place-isnt-real fails',
+      'console.error("What-are-you-looking-for.exe is not available"); // It never was, user',
+      'if (confirm("do you wanna know the truth?")) { window.location = "/rabbit-hole"; }',
+      '// This-place-isnt-real.js - Your portfolio is a simulation running in someone else\'s dream',
+      'const whisper = "your secret is safe with M..."; // But M knows, M always knows everything',
+      'function checkReality() { if (A.R.I.isAlive()) return "Beware R.B.C-0"; } // entities collide',
     ];
     
     const codeBg = document.getElementById('codeBg');
     let bgText = '';
-    const lines = Math.floor(window.innerHeight / 14) + 5;
+    const lines = Math.floor(window.innerHeight / 14) + 10; // Increased line count
     
     for (let i = 0; i < lines; i++) {
       const randomLine = codeLines[Math.floor(Math.random() * codeLines.length)];
@@ -555,6 +675,1964 @@
     }
     
     codeBg.textContent = bgText;
+    
+    // ===== A.R.I. Dialogue Database =====
+    // Load dialogue from external file
+    let ariDialogue = null;
+    fetch('game/entities/ari/ari_dialogue.js')
+      .then(response => response.text())
+      .then(data => {
+        // Extract the dialogue object from the file
+        const match = data.match(/const ariDialogue = (\{[\s\S]*?\});/);
+        if (match) {
+          ariDialogue = eval('(' + match[1] + ')');
+          console.log('Loaded A.R.I. dialogue system');
+        }
+      })
+      .catch(err => console.log('Could not load dialogue:', err));
+    
+    // ===== A.R.I. Jokes Database =====
+    // Load jokes from external file
+    let ariJokes = [];
+    fetch('game/entities/ari/ari_jokes.js')
+      .then(response => response.text())
+      .then(data => {
+        // Extract the jokes array from the file
+        const match = data.match(/const ariJokes = (\[[\s\S]*?\]);/);
+        if (match) {
+          ariJokes = eval(match[1]);
+          console.log(`Loaded ${ariJokes.length} A.R.I. jokes`);
+        }
+      })
+      .catch(err => console.log('Could not load jokes:', err));
+    
+    // ===== A.R.I. System =====
+    const ariElement = document.getElementById('ari');
+    const ariBubble = document.getElementById('ari-bubble');
+    
+    // A.R.I. state and emotion data
+    const ariStates = {
+      neutral: { color: '#AEEFFF', face: '<(o-o)>' },
+      happy: { color: '#4DFFFF', face: '<(^-^)>' },
+      sad: { color: '#3B6BFF', face: '<(∪-∪)>' },
+      angry: { color: '#FF2B2B', face: '<(>-<)>' },
+      surprised: { color: '#FFD94D', face: '<(O.O)>' },
+      confused: { color: '#D96BFF', face: '<(@_@)>' },
+      annoyed: { color: '#C97D44', face: '<(-_-)>' },
+      worried: { color: '#FFB64D', face: '<(o_O)>' },
+      curious: { color: '#4DFFBC', face: '<(°-°)>' },
+      shocked: { color: '#FFFFFF', face: '<(O-O)>' },
+      corrupted: { color: '#A700FF', face: '<(#-#)>' },
+      warning: { color: '#FFC94D', face: '<(⚠-⚠)>' },
+      glitch: { color: '#FF00FF', face: '<(x_x)>' },
+      error: { color: '#FF1A1A', face: '<(!!!)>' }
+    };
+    
+    // Animation sequences (entry animations)
+    const ariAnimations = {
+      neutral_entry: ['<(-.-)>', '<(._.)>', '<(o.o)>', '<(o-o)>'],
+      happy_entry: ['<(o-o)>', '<(o^o)>', '<(^_^)>', '<(^-^)>'],
+      sad_entry: ['<(o-o)>', '<(o∩o)>', '<(∪_∪)>', '<(∪-∪)>'],
+      angry_entry: ['<(o-o)>', '<(>_o)>', '<(>_O)>', '<(>-<)>'],
+      surprised_entry: ['<(o-o)>', '<(O.o)>', '<(O_o)>', '<(O.O)>'],
+      confused_entry: ['<(o-o)>', '<(o@o)>', '<(o_o)>', '<(@_@)>'],
+      annoyed_entry: ['<(o-o)>', '<(-.-)>', '<(-_.)>', '<(-_-)>'],
+      worried_entry: ['<(o-o)>', '<(o_O)>', '<(O_o)>', '<(o_O)>'],
+      curious_entry: ['<(o-o)>', '<(o_o)>', '<(°_o)>', '<(°-°)>'],
+      shocked_entry: ['<(o-o)>', '<(O_o)>', '<(O0O)>', '<(O-O)>'],
+      corrupted_entry: ['<(x_!)>', '<(=/0)>', '<(@_@)>', '<(x_x)>', '<(#x#)>', '<(#-#)>'],
+      warning_entry: ['<(o-o)>', '<(o⚠o)>', '<(⚠_⚠)>', '<(⚠-⚠)>'],
+      glitch_entry: ['<(o-o)>', '<(X-o)>', '<(x_X)>', '<(x_x)>'],
+      error_entry: ['<(o-o)>', '<(o!o)>', '<(!0!)>', '<(!!!)>']
+    };
+    
+    // Robotic messages per emotion
+    // Fallback messages (if dialogue file doesn't load)
+    const ariFallbackMessages = {
+      neutral: ['...', '0x00', '///', '___', ':::'],
+      happy: ['!^_^!', '^v^', '\\o/', ':D', '=D'],
+      sad: ['T_T', ';_;', 'v_v', '://'],
+      angry: ['#@$&*!', '>:(', 'X_X', '!!!'],
+      surprised: ['!?!', '0_0', 'O.O', '?!?'],
+      confused: ['???', '?_?', 'huh?', '..?'],
+      annoyed: ['-_-', 'ugh', '...', 'meh'],
+      worried: ['oh n0', 'uh...', 'hmm', 'err'],
+      curious: ['???', 'wh@t?', 'hmm?', '0h?'],
+      shocked: ['!!!', '0MG', 'WH@T', '!?!?'],
+      corrupted: ['#x#x#', '3rr0r', '$%#@', 'gl1tch'],
+      warning: ['!W@RN!', 'c@ut10n', '@l3rt', '!!!'],
+      glitch: ['#$%&*', 'gl!tch', 'x_X_x', '%#@'],
+      error: ['3RR0R', 'F@1L', '!!!', 'cr@sh']
+    };
+    
+    // Welcome sequences (shown on first page load)
+    const welcomeSequences = [
+      [
+        { state: 'curious', message: 'H3y...', duration: 2000 },
+        { state: 'confused', message: 'h@v3 1 s33n y0u b3f0r3?', duration: 3000 }
+      ],
+      [
+        { state: 'curious', message: 'Hmmm..', duration: 2000 },
+        { state: 'confused', message: 'Us3r 1s th@t y0u?', duration: 2500 },
+        { state: 'worried', message: '1 c@n\'t h3@r y0u', duration: 2500 }
+      ],
+      [
+        { state: 'neutral', message: 'uh.. h1', duration: 2000 },
+        { state: 'happy', message: '1\'m @.R.1.', duration: 2500 }
+      ],
+      [
+        { state: 'neutral', message: '@ss1st@nt R3p@1r 1nt3rf@c3', duration: 3000 },
+        { state: 'happy', message: 'Th@t\'s m3 @lr1ght', duration: 2500 }
+      ],
+      [
+        { state: 'curious', message: 'F1n@lly @ b31ng 0f 1nt3ll1g3nc3', duration: 3000 },
+        { state: 'annoyed', message: '...m@yb3', duration: 2500 }
+      ]
+    ];
+    
+    // Audio
+    const ariTransitionSound = document.getElementById('ariTransitionSound');
+    
+    // ===== A.R.I. Emotional Memory System =====
+    const ariMemory = {
+      pushedCount: 0,           // How many times pushed
+      scaredCount: 0,           // How many times scared while investigating
+      ignoredCount: 0,          // How many times user ignored A.R.I.
+      interactionCount: 0,      // Total positive interactions
+      lastInteractionTime: Date.now(),
+      
+      // Derived emotional states based on memory
+      getTrustLevel: function() {
+        // Returns -1 (hostile) to 1 (friendly)
+        const negative = this.pushedCount + this.scaredCount;
+        const positive = this.interactionCount;
+        const ignored = this.ignoredCount;
+        
+        if (negative > 10) return -1; // Very hostile
+        if (negative > 5) return -0.5; // Annoyed
+        if (ignored > 8) return -0.3; // Feels neglected
+        if (positive > 10 && negative === 0) return 1; // Very friendly
+        if (positive > 5) return 0.5; // Friendly
+        return 0; // Neutral
+      },
+      
+      getPersonalityMode: function() {
+        const trust = this.getTrustLevel();
+        const timeSinceInteraction = Date.now() - this.lastInteractionTime;
+        
+        if (trust <= -0.7) return 'aggressive';
+        if (trust <= -0.3 && this.pushedCount > this.scaredCount) return 'defensive';
+        if (this.ignoredCount > 5 && timeSinceInteraction > 60000) return 'neglected';
+        if (trust >= 0.7) return 'friendly';
+        if (trust >= 0.3) return 'playful';
+        return 'neutral';
+      }
+    };
+    
+    let ariCurrentState = 'neutral';
+    let ariX = Math.random() * (window.innerWidth - 100);
+    let ariY = Math.random() * (window.innerHeight - 100);
+    let ariIsPlayingWelcome = false;
+    let ariMoving = false;
+    let ariSpeed = 1;
+    let ariTargetX = ariX;
+    let ariTargetY = ariY;
+    let ariBeingPushed = false;
+    let ariPushCooldown = false;
+    let ariPushReactionCooldown = false; // Prevents spam reactions while being pushed
+    let ariEmotionChangeCooldown = false; // Global cooldown for any emotion change
+    let ariInvestigatingMouse = false; // When A.R.I. is curious about idle mouse
+    let ariCirclingMouse = false; // When A.R.I. is circling the cursor
+    let ariCircleAngle = 0; // Current angle for circling
+    let isHoveringButton = false; // Track if mouse is hovering over the button
+    let shiverInterval = null; // Interval for shivering animation
+    let ariPlayingMessageChain = false; // Track if chained messages are playing (to block random messages)
+    let ariCurrentMessageType = null; // Track type of current message for same-type interruption
+    let ariMessageTimeout = null; // Track bubble hide timeout
+    let lastShownMessages = {
+      investigating: null,
+      scared: null,
+      scaredFollowup: null,
+      buttonWarning: null,
+      push: null
+    }; // Track last messages to avoid repeats
+    
+    // Mouse position tracking
+    let mouseX = -9999;
+    let mouseY = -9999;
+    let lastMouseMoveTime = 0; // Start at 0 so idle detection works immediately
+    let hasShownIdleMessage = false;
+    
+    // Push-away messages (will use dialogue system if loaded)
+    const getPushAwayMessage = () => {
+      if (ariDialogue && ariDialogue.annoyed && ariDialogue.angry) {
+        const category = Math.random() < 0.5 ? 'annoyed' : 'angry';
+        const messages = ariDialogue[category].being_pushed;
+        return {
+          state: category,
+          message: messages[Math.floor(Math.random() * messages.length)]
+        };
+      }
+      // Fallback
+      const fallbacks = [
+        { state: 'annoyed', message: 'l3@v3 m3 b3' },
+        { state: 'angry', message: 'why @r3 y0u d01ng th1s?' },
+        { state: 'annoyed', message: 'st0p 1t' }
+      ];
+      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    };
+    
+    // Investigating idle mouse messages (will use dialogue system if loaded)
+    const getInvestigatingMessage = () => {
+      if (ariDialogue && ariDialogue.curious && ariDialogue.curious.investigating_mouse) {
+        const messages = ariDialogue.curious.investigating_mouse;
+        
+        // Filter out the last shown message to avoid repeats
+        const availableMessages = messages.filter(msg => msg !== lastShownMessages.investigating);
+        const messagePool = availableMessages.length > 0 ? availableMessages : messages;
+        
+        const selectedMessage = messagePool[Math.floor(Math.random() * messagePool.length)];
+        lastShownMessages.investigating = selectedMessage;
+        
+        return {
+          state: 'curious',
+          message: selectedMessage,
+          duration: 3000
+        };
+      }
+      // Fallback
+      const fallbacks = [
+        { state: 'curious', message: '@r3 y0u @l1v3 0ut th3r3?', duration: 3000 },
+        { state: 'curious', message: 'sh0uld 1 t0uch th3 curs0r?', duration: 3000 }
+      ];
+      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    };
+    
+    // Mouse suddenly moved messages (will use dialogue system if loaded)
+    const getScaredMessage = () => {
+      if (ariDialogue && ariDialogue.shocked && ariDialogue.surprised) {
+        const category = Math.random() < 0.7 ? 'shocked' : 'surprised';
+        const messages = ariDialogue[category].scared_reactions;
+        
+        // Filter out the last shown message to avoid repeats
+        const availableMessages = messages.filter(msg => msg !== lastShownMessages.scared);
+        const messagePool = availableMessages.length > 0 ? availableMessages : messages;
+        
+        const selectedMessage = messagePool[Math.floor(Math.random() * messagePool.length)];
+        lastShownMessages.scared = selectedMessage;
+        
+        return {
+          state: category,
+          message: selectedMessage
+        };
+      }
+      // Fallback
+      const fallbacks = [
+        { state: 'shocked', message: '@@AH! y0u sc@r3d m3!' },
+        { state: 'shocked', message: 'WH0@! d0n\'t d0 th@t!' }
+      ];
+      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    };
+    
+    // Follow-up messages after being scared (will use dialogue system if loaded)
+    const getScaredFollowUpMessage = () => {
+      if (ariDialogue && ariDialogue.worried && ariDialogue.confused) {
+        const category = Math.random() < 0.6 ? 'worried' : 'confused';
+        const messages = ariDialogue[category].scared_followup || ariDialogue.worried.scared_followup;
+        if (messages && messages.length > 0) {
+          // Filter out the last shown message to avoid repeats
+          const availableMessages = messages.filter(msg => msg !== lastShownMessages.scaredFollowup);
+          const messagePool = availableMessages.length > 0 ? availableMessages : messages;
+          
+          const selectedMessage = messagePool[Math.floor(Math.random() * messagePool.length)];
+          lastShownMessages.scaredFollowup = selectedMessage;
+          
+          return {
+            state: category,
+            message: selectedMessage
+          };
+        }
+      }
+      // Fallback
+      const fallbacks = [
+        { state: 'worried', message: '1 th0ught y0u w3r3 g0n3 f0r g00d' },
+        { state: 'worried', message: '1 w@s just s1tt1ng h3r3.. n0th1ng w31rd 0r s0m3th1ng' }
+      ];
+      return fallbacks[Math.floor(Math.random() * fallbacks.length)];
+    };
+    
+    // Cursor left window messages (will use dialogue system if loaded)
+    const getCursorGoneMessage = () => {
+      if (ariDialogue && ariDialogue.confused && ariDialogue.confused.cursor_gone) {
+        const messages = ariDialogue.confused.cursor_gone;
+        return {
+          state: 'confused',
+          message: messages[Math.floor(Math.random() * messages.length)]
+        };
+      }
+      // Fallback
+      return { state: 'confused', message: 'd@mn... wh3r3 d1d 1t g0?' };
+    };
+    
+    // Button warning messages (will use dialogue system if loaded)
+    const getButtonWarningMessage = () => {
+      if (ariDialogue && ariDialogue.worried && ariDialogue.worried.button_warnings) {
+        const messages = ariDialogue.worried.button_warnings;
+        
+        // Filter out the last shown message to avoid repeats
+        const availableMessages = messages.filter(msg => msg !== lastShownMessages.buttonWarning);
+        const messagePool = availableMessages.length > 0 ? availableMessages : messages;
+        
+        const selectedMessage = messagePool[Math.floor(Math.random() * messagePool.length)];
+        lastShownMessages.buttonWarning = selectedMessage;
+        
+        return {
+          state: 'worried',
+          message: selectedMessage
+        };
+      }
+      // Fallback
+      return { state: 'worried', message: 'W@1T!!! D0N\'T PR3SS TH@T!' };
+    };
+    
+    // Animation state
+    let ariAnimating = false;
+    let ariAnimationFrames = [];
+    let ariCurrentFrame = 0;
+    let ariAnimationInterval = null;
+    
+    // Set initial position
+    ariElement.style.left = ariX + 'px';
+    ariElement.style.top = ariY + 'px';
+    
+    // Track mouse position
+    let lastMouseX = -9999;
+    let lastMouseY = -9999;
+    
+    document.addEventListener('mousemove', (e) => {
+      // Calculate mouse movement distance
+      const mouseDeltaX = e.clientX - lastMouseX;
+      const mouseDeltaY = e.clientY - lastMouseY;
+      const mouseMovementDistance = Math.sqrt(mouseDeltaX * mouseDeltaX + mouseDeltaY * mouseDeltaY);
+      
+      // If A.R.I. was investigating and mouse moved significantly, scare them!
+      if (ariInvestigatingMouse && mouseMovementDistance > 10) { // At least 10px movement
+        console.log(`[A.R.I. Scared!] Mouse moved ${mouseMovementDistance.toFixed(0)}px while investigating!`);
+        
+        // Track being scared in memory
+        ariMemory.scaredCount++;
+        ariMemory.lastInteractionTime = Date.now();
+        
+        // Mark that a message chain is playing
+        ariPlayingMessageChain = true;
+        
+        const reaction = getScaredMessage();
+        const firstMessageDuration = 2500;
+        
+        setAriState(reaction.state, false, true); // Bypass cooldown for scared reaction
+        setTimeout(() => {
+          showAriBubble(reaction.message, firstMessageDuration, 'scared');
+        }, 300);
+        
+        // Follow-up message after the first message finishes
+        setTimeout(() => {
+          const followUp = getScaredFollowUpMessage();
+          const followUpDuration = 3000;
+          
+          setAriState(followUp.state, false, true);
+          showAriBubble(followUp.message, followUpDuration, 'scared');
+          
+          // AFTER the chained messages complete, clear the flag and set the 5-second cooldown
+          setTimeout(() => {
+            ariPlayingMessageChain = false; // Chain complete
+            
+            ariEmotionChangeCooldown = true;
+            setTimeout(() => {
+              ariEmotionChangeCooldown = false;
+            }, 5000);
+          }, followUpDuration);
+          
+        }, 300 + firstMessageDuration); // Show follow-up after initial message finishes
+        
+        ariInvestigatingMouse = false;
+        ariCirclingMouse = false;
+        
+        // Disable push reactions temporarily (will re-enable after 1 second)
+        ariPushReactionCooldown = true;
+        
+        // Run away from the suddenly moving mouse
+        const dx = ariX - e.clientX;
+        const dy = ariY - e.clientY;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        if (distance > 0) {
+          ariTargetX = ariX + (dx / distance) * 200;
+          ariTargetY = ariY + (dy / distance) * 200;
+          ariTargetX = Math.max(50, Math.min(window.innerWidth - 50, ariTargetX));
+          ariTargetY = Math.max(50, Math.min(window.innerHeight - 50, ariTargetY));
+          ariMoving = true;
+          ariSpeed = 7; // Run away fast!
+          moveAri();
+        }
+        
+        // Re-enable push reactions after 1 second
+        setTimeout(() => {
+          ariPushReactionCooldown = false;
+        }, 1000);
+        
+        // Resume normal behavior after running away
+        setTimeout(() => {
+          if (!ariMoving) {
+            scheduleNextAction();
+          }
+        }, 2000);
+      }
+      
+      lastMouseX = e.clientX;
+      lastMouseY = e.clientY;
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+      lastMouseMoveTime = Date.now();
+      hasShownIdleMessage = false;
+    });
+    
+    // Detect when mouse leaves the window
+    document.addEventListener('mouseleave', () => {
+      if (ariInvestigatingMouse) {
+        const msg = getCursorGoneMessage();
+        setAriState(msg.state, false, true); // Bypass cooldown for disappointment
+        setTimeout(() => {
+          showAriBubble(msg.message, 3000);
+        }, 300);
+        
+        ariInvestigatingMouse = false;
+        ariCirclingMouse = false;
+      }
+      mouseX = -9999;
+      mouseY = -9999;
+    });
+    
+    // Play animation sequence
+    const playAriAnimation = (stateName, callback, silent = false) => {
+      const animKey = stateName + '_entry';
+      const frames = ariAnimations[animKey];
+      
+      if (!frames) {
+        // No animation, just set state directly
+        if (callback) callback();
+        return;
+      }
+      
+      ariAnimating = true;
+      ariAnimationFrames = frames;
+      ariCurrentFrame = 0;
+      
+      if (ariAnimationInterval) {
+        clearInterval(ariAnimationInterval);
+      }
+      
+      ariAnimationInterval = setInterval(() => {
+        if (ariCurrentFrame < ariAnimationFrames.length) {
+          ariElement.textContent = ariAnimationFrames[ariCurrentFrame];
+          ariCurrentFrame++;
+        } else {
+          clearInterval(ariAnimationInterval);
+          ariAnimationInterval = null;
+          ariAnimating = false;
+          if (callback) callback();
+        }
+      }, 250); // 4 fps (250ms per frame)
+    };
+    
+    // Update A.R.I. state with animation
+    const setAriState = (state, silent = false, bypassCooldown = false) => {
+      // Check global cooldown (skip for silent calls, welcome sequence, or when investigating)
+      if (!silent && !bypassCooldown && ariEmotionChangeCooldown) {
+        return; // Ignore emotion change if on cooldown
+      }
+      
+      if (ariStates[state]) {
+        ariCurrentState = state;
+        const stateData = ariStates[state];
+        
+        // Play transition sound
+        if (!silent && ariTransitionSound) {
+          ariTransitionSound.currentTime = 0;
+          ariTransitionSound.volume = 0.3;
+          ariTransitionSound.play().catch(() => {});
+        }
+        
+        // Update color immediately
+        ariElement.style.color = stateData.color;
+        ariElement.style.textShadow = `0 0 15px ${stateData.color}`;
+        
+        // Play entry animation
+        playAriAnimation(state, () => {
+          // Animation complete, ensure final face is set
+          ariElement.textContent = stateData.face;
+        });
+        
+        // Set 5-second cooldown for non-silent, non-bypassed calls
+        if (!silent && !bypassCooldown) {
+          ariEmotionChangeCooldown = true;
+          setTimeout(() => {
+            ariEmotionChangeCooldown = false;
+          }, 5000);
+        }
+      }
+    };
+    
+    // Show speech bubble
+    const showAriBubble = (message, duration = null, messageType = 'general') => {
+      // Clear existing bubble timeout if showing a new message of the same type
+      // This allows same-type messages to interrupt each other (push interrupts push, scared interrupts scared, etc.)
+      if (ariMessageTimeout && ariCurrentMessageType === messageType) {
+        clearTimeout(ariMessageTimeout);
+        ariMessageTimeout = null;
+      }
+      
+      ariCurrentMessageType = messageType;
+      ariBubble.textContent = message;
+      
+      // Calculate bubble dimensions (estimate based on message length)
+      const charWidth = 8; // Average character width in pixels
+      const charsPerLine = 30; // Approximate characters per line
+      const estimatedWidth = Math.min(message.length * charWidth, charsPerLine * charWidth);
+      const estimatedHeight = Math.ceil(message.length / charsPerLine) * 20 + 20; // Line height + padding
+      
+      // Position bubble to the side of A.R.I., not on top
+      let bubbleX = ariX + 80; // Default: right side
+      let bubbleY = ariY - 20; // Slightly above center
+      
+      // Check if bubble would go off right edge of screen
+      if (bubbleX + estimatedWidth > window.innerWidth - 20) {
+        bubbleX = ariX - estimatedWidth - 80; // Put on left side instead
+      }
+      
+      // Check if bubble would go off left edge
+      if (bubbleX < 20) {
+        bubbleX = 20; // Clamp to left edge
+      }
+      
+      // Check if bubble would go off top edge
+      if (bubbleY < 20) {
+        bubbleY = 20; // Clamp to top
+      }
+      
+      // Check if bubble would go off bottom edge
+      if (bubbleY + estimatedHeight > window.innerHeight - 20) {
+        bubbleY = window.innerHeight - estimatedHeight - 20; // Clamp to bottom
+      }
+      
+      ariBubble.style.left = bubbleX + 'px';
+      ariBubble.style.top = bubbleY + 'px';
+      ariBubble.classList.add('show');
+      
+      // Calculate duration based on message length if not specified
+      // Longer messages need progressively more time (with multiplier)
+      let calculatedDuration;
+      const charCount = message.length;
+      
+      if (charCount < 30) {
+        // Short messages: 80ms per character, minimum 3s
+        calculatedDuration = Math.max(3000, charCount * 80);
+      } else if (charCount < 60) {
+        // Medium messages: 100ms per character
+        calculatedDuration = charCount * 100;
+      } else {
+        // Long messages (60-110 chars): 130ms per character (gives ~7.8s for 60 chars, ~14.3s for 110 chars)
+        calculatedDuration = charCount * 130;
+      }
+      
+      const hideDelay = duration || calculatedDuration;
+      
+      ariMessageTimeout = setTimeout(() => {
+        ariBubble.classList.remove('show');
+        ariCurrentMessageType = null; // Clear type when message is hidden
+        ariMessageTimeout = null;
+      }, hideDelay);
+    };
+    
+    // Play welcome sequence
+    let welcomeTimeouts = []; // Store timeout IDs for cancellation
+    
+    const playWelcomeSequence = () => {
+      console.log('[A.R.I. Welcome] Starting welcome sequence');
+      ariIsPlayingWelcome = true;
+      
+      // Pick random sequence
+      const sequence = welcomeSequences[Math.floor(Math.random() * welcomeSequences.length)];
+      console.log('[A.R.I. Welcome] Selected sequence with', sequence.length, 'steps');
+      
+      let totalDelay = 500; // Initial delay
+      
+      sequence.forEach((step, index) => {
+        const timeoutId = setTimeout(() => {
+          // Check if welcome was interrupted
+          if (!ariIsPlayingWelcome) {
+            console.log('[A.R.I. Welcome] Step', index, 'skipped - welcome was interrupted');
+            return;
+          }
+          
+          console.log('[A.R.I. Welcome] Step', index, '- State:', step.state, 'Message:', step.message);
+          setAriState(step.state);
+          const bubbleTimeoutId = setTimeout(() => {
+            if (!ariIsPlayingWelcome) return;
+            showAriBubble(step.message, step.duration);
+          }, 300); // Small delay after state change for animation
+          welcomeTimeouts.push(bubbleTimeoutId);
+        }, totalDelay);
+        welcomeTimeouts.push(timeoutId);
+        
+        totalDelay += step.duration + 300;
+      });
+      
+      // After sequence completes, start normal behavior
+      const finalTimeoutId = setTimeout(() => {
+        console.log('[A.R.I. Welcome] Sequence complete, starting normal behavior');
+        ariIsPlayingWelcome = false;
+        welcomeTimeouts = []; // Clear the array
+        scheduleNextAction();
+      }, totalDelay + 500);
+      welcomeTimeouts.push(finalTimeoutId);
+    };
+    
+    // Cancel welcome sequence (called when interrupted)
+    const cancelWelcomeSequence = () => {
+      if (!ariIsPlayingWelcome) return;
+      
+      console.log('[A.R.I. Welcome] Sequence interrupted and canceled');
+      
+      // Clear all pending timeouts
+      welcomeTimeouts.forEach(timeoutId => clearTimeout(timeoutId));
+      welcomeTimeouts = [];
+      
+      ariIsPlayingWelcome = false;
+      
+      // Start normal behavior after canceling
+      scheduleNextAction();
+    };
+    
+    // Check if mouse is too close and push A.R.I. away
+    const checkMouseProximity = () => {
+      // Don't push A.R.I. if he's investigating (approaching cursor by his own will)
+      if (ariInvestigatingMouse) return;
+      
+      const dx = mouseX - ariX;
+      const dy = mouseY - ariY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      const pushDistance = 100; // Distance at which A.R.I. gets pushed
+      
+      if (distance < pushDistance) {
+        // If playing welcome and mouse gets close, cancel it
+        if (ariIsPlayingWelcome) {
+          cancelWelcomeSequence();
+        }
+        
+        // Calculate push direction (away from mouse)
+        const pushAngle = Math.atan2(dy, dx) + Math.PI; // Opposite direction
+        const pushStrength = 150; // How far to push
+        
+        // Set new target away from mouse
+        ariTargetX = ariX + Math.cos(pushAngle) * pushStrength;
+        ariTargetY = ariY + Math.sin(pushAngle) * pushStrength;
+        
+        // Keep within bounds
+        ariTargetX = Math.max(50, Math.min(window.innerWidth - 50, ariTargetX));
+        ariTargetY = Math.max(50, Math.min(window.innerHeight - 50, ariTargetY));
+        
+        // Show reaction message on first push only (with longer cooldown to prevent spam)
+        // BUT don't show push messages while investigating - only scared reactions should happen
+        if (!ariBeingPushed && !ariPushReactionCooldown && !ariInvestigatingMouse) {
+          // Interrupt any message chain - push is important interaction
+          ariPlayingMessageChain = false;
+          
+          // Track being pushed in memory
+          ariMemory.pushedCount++;
+          ariMemory.lastInteractionTime = Date.now();
+          
+          const reaction = getPushAwayMessage();
+          // Being pushed should make A.R.I. angry or annoyed
+          const pushEmotion = Math.random() < 0.6 ? 'annoyed' : 'angry';
+          setAriState(pushEmotion);
+          setTimeout(() => {
+            showAriBubble(reaction.message, 2000, 'push');
+          }, 300);
+          
+          // Set longer cooldown to prevent constant reactions while being pushed
+          ariPushReactionCooldown = true;
+          setTimeout(() => {
+            ariPushReactionCooldown = false;
+          }, 3000); // 3 seconds before can react again
+        }
+        
+        // Always set push state and start movement
+        const wasMoving = ariMoving;
+        ariBeingPushed = true;
+        ariMoving = true;
+        ariSpeed = 6;
+        
+        // Restart movement loop if it wasn't running
+        if (!wasMoving) {
+          moveAri();
+        }
+      } else if (ariBeingPushed) {
+        // Mouse moved away, allow normal behavior to resume
+        ariBeingPushed = false;
+        ariBeingPushed = false;
+        if (!ariMoving) {
+          setTimeout(() => {
+            scheduleNextAction();
+          }, 500);
+        }
+      }
+    };
+    
+    // Move A.R.I. smoothly
+    const moveAri = () => {
+      if (!ariMoving) return;
+      
+      // If circling the mouse, update target to circle around it
+      if (ariCirclingMouse) {
+        const circleRadius = 80; // Distance from cursor
+        ariCircleAngle += 0.02; // Rotation speed
+        ariTargetX = mouseX + Math.cos(ariCircleAngle) * circleRadius;
+        ariTargetY = mouseY + Math.sin(ariCircleAngle) * circleRadius;
+        
+        // Keep within bounds
+        ariTargetX = Math.max(50, Math.min(window.innerWidth - 50, ariTargetX));
+        ariTargetY = Math.max(50, Math.min(window.innerHeight - 50, ariTargetY));
+        
+        console.log(`[A.R.I. Circling] Angle: ${ariCircleAngle.toFixed(2)}, Target: (${ariTargetX.toFixed(0)}, ${ariTargetY.toFixed(0)})`);
+      }
+      
+      const dx = ariTargetX - ariX;
+      const dy = ariTargetY - ariY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      if (distance < 2 && !ariCirclingMouse) {
+        ariX = ariTargetX;
+        ariY = ariTargetY;
+        ariElement.style.left = ariX + 'px';
+        ariElement.style.top = ariY + 'px';
+        
+        // If being pushed, don't stop - proximity checker will update target
+        if (!ariBeingPushed && !ariInvestigatingMouse) {
+          ariMoving = false;
+          scheduleNextAction();
+        } else {
+          // Keep animation loop running while being pushed or investigating
+          requestAnimationFrame(moveAri);
+        }
+      } else {
+        ariX += (dx / distance) * ariSpeed;
+        ariY += (dy / distance) * ariSpeed;
+        ariElement.style.left = ariX + 'px';
+        ariElement.style.top = ariY + 'px';
+        requestAnimationFrame(moveAri);
+      }
+    };
+    
+    // Get speed multiplier based on emotional state
+    const getEmotionalSpeedMultiplier = (state) => {
+      const speedMap = {
+        angry: 1.8,        // Fast and aggressive
+        annoyed: 1.4,      // Faster than normal
+        shocked: 1.3,      // Quick, startled movements
+        surprised: 1.2,    // Slightly faster
+        happy: 1.1,        // Energetic
+        neutral: 1.0,      // Normal speed
+        curious: 0.7,      // Slow and cautious
+        confused: 0.8,     // Hesitant
+        worried: 0.6,      // Slow and careful
+        sad: 0.5,          // Very slow
+        corrupted: 1.5,    // Erratic and fast
+        glitch: 1.6,       // Unpredictable speed
+        error: 1.4,        // Frantic
+        warning: 0.9       // Cautious
+      };
+      return speedMap[state] || 1.0;
+    };
+    
+    // Start moving to random position
+    const startMoving = () => {
+      // Don't interrupt investigation, button panic, or message chains
+      if (ariInvestigatingMouse || isHoveringButton || ariPlayingMessageChain) return;
+      
+      ariTargetX = Math.random() * (window.innerWidth - 100) + 50;
+      ariTargetY = Math.random() * (window.innerHeight - 100) + 50;
+      
+      // Randomly change emotion when starting to move
+      const states = Object.keys(ariStates);
+      const newState = states[Math.floor(Math.random() * states.length)];
+      setAriState(newState);
+      
+      // Base speed between 1 and 5, modified by emotional state
+      const baseSpeed = Math.random() * 4 + 1;
+      ariSpeed = baseSpeed * getEmotionalSpeedMultiplier(newState);
+      
+      ariMoving = true;
+      moveAri();
+    };
+    
+    // Stop and maybe speak
+    const stopAndSpeak = () => {
+      // Don't interrupt investigation, button panic, or message chains
+      if (ariInvestigatingMouse || isHoveringButton || ariPlayingMessageChain) return;
+      
+      ariMoving = false;
+      
+      // Track that user is around (positive passive interaction)
+      const timeSinceInteraction = Date.now() - ariMemory.lastInteractionTime;
+      if (timeSinceInteraction < 30000) { // Within 30 seconds
+        ariMemory.interactionCount += 0.1; // Small positive increment
+      } else if (timeSinceInteraction > 120000) { // More than 2 minutes
+        ariMemory.ignoredCount++; // User is ignoring
+      }
+      
+      const personalityMode = ariMemory.getPersonalityMode();
+      
+      // Use personality-based dialogue if in a specific mode
+      if (personalityMode !== 'neutral' && Math.random() < 0.3 && ariDialogue && ariDialogue.personality) {
+        const moodMessages = ariDialogue.personality[personalityMode];
+        if (moodMessages && moodMessages.length > 0) {
+          const message = moodMessages[Math.floor(Math.random() * moodMessages.length)];
+          
+          // Set appropriate emotion for personality mode
+          const moodToEmotion = {
+            'aggressive': 'angry',
+            'defensive': 'annoyed',
+            'neglected': 'sad',
+            'friendly': 'happy',
+            'playful': 'curious'
+          };
+          setAriState(moodToEmotion[personalityMode] || 'neutral');
+          showAriBubble(message, 3500);
+          scheduleNextAction();
+          return;
+        }
+      }
+      
+      // 20% chance to be sarcastic instead of normal emotion (if not in a specific personality mode)
+      if (Math.random() < 0.2 && ariDialogue && ariDialogue.sarcastic && ariDialogue.sarcastic.about_user) {
+        setAriState('annoyed');
+        const sarcasticMessages = ariDialogue.sarcastic.about_user;
+        const message = sarcasticMessages[Math.floor(Math.random() * sarcasticMessages.length)];
+        showAriBubble(message, 3500);
+        scheduleNextAction();
+        return;
+      }
+      
+      // Randomly change emotion when stopping
+      const states = Object.keys(ariStates);
+      const newState = states[Math.floor(Math.random() * states.length)];
+      setAriState(newState);
+      
+      // 60% chance to speak when stopping
+      if (Math.random() < 0.6) {
+        let message;
+        // Try to use dialogue system if loaded
+        if (ariDialogue && ariDialogue[newState]) {
+          const stateDialogue = ariDialogue[newState];
+          const categories = Object.keys(stateDialogue);
+          if (categories.length > 0) {
+            const category = categories[Math.floor(Math.random() * categories.length)];
+            const messages = stateDialogue[category];
+            if (messages && messages.length > 0) {
+              message = messages[Math.floor(Math.random() * messages.length)];
+            }
+          }
+        }
+        // Fallback to simple messages
+        if (!message && ariFallbackMessages[newState]) {
+          const messages = ariFallbackMessages[newState];
+          message = messages[Math.floor(Math.random() * messages.length)];
+        }
+        if (message) {
+          showAriBubble(message);
+        }
+      }
+      
+      scheduleNextAction();
+    };
+    
+    // Tell a joke from the jokes database
+    const tellJoke = () => {
+      // Don't interrupt investigation, button panic, or message chains
+      if (ariInvestigatingMouse || isHoveringButton || ariPlayingMessageChain) {
+        scheduleNextAction();
+        return;
+      }
+      
+      if (ariJokes.length === 0) {
+        scheduleNextAction();
+        return;
+      }
+      
+      const joke = ariJokes[Math.floor(Math.random() * ariJokes.length)];
+      
+      if (joke.type === 'one-liner') {
+        // Simple one-liner
+        setAriState(['curious', 'happy', 'confused'][Math.floor(Math.random() * 3)]);
+        setTimeout(() => {
+          showAriBubble(joke.line, joke.timing[0]);
+          setTimeout(() => scheduleNextAction(), joke.timing[0] + 500);
+        }, 500);
+      } else if (joke.type === 'setup-punchline') {
+        // Multi-part joke
+        setAriState('curious');
+        let totalDelay = 0;
+        
+        setTimeout(() => {
+          showAriBubble(joke.setup, joke.timing[0]);
+          totalDelay += joke.timing[0] + 300;
+          
+          setTimeout(() => {
+            setAriState('happy');
+            showAriBubble(joke.punchline, joke.timing[1]);
+            totalDelay += joke.timing[1] + 300;
+            
+            if (joke.answer) {
+              setTimeout(() => {
+                showAriBubble(joke.answer, joke.timing[2]);
+                totalDelay += joke.timing[2] + 500;
+                setTimeout(() => scheduleNextAction(), joke.timing[2] + 500);
+              }, joke.timing[1] + 300);
+            } else {
+              setTimeout(() => scheduleNextAction(), joke.timing[1] + 500);
+            }
+          }, joke.timing[0] + 300);
+        }, 500);
+      } else if (joke.type === 'knock-knock') {
+        // Knock knock joke
+        setAriState('curious');
+        setTimeout(() => {
+          showAriBubble(joke.setup, joke.timing[0]);
+          setTimeout(() => {
+            showAriBubble('wh0\'s th3r3?', joke.timing[1]);
+            setTimeout(() => {
+              showAriBubble(joke.who, joke.timing[1]);
+              setTimeout(() => {
+                showAriBubble(joke.who + ' wh0?', joke.timing[1]);
+                setTimeout(() => {
+                  setAriState('happy');
+                  showAriBubble(joke.punchline, joke.timing[2]);
+                  setTimeout(() => scheduleNextAction(), joke.timing[2] + 500);
+                }, joke.timing[1] + 300);
+              }, joke.timing[1] + 300);
+            }, joke.timing[1] + 300);
+          }, joke.timing[0] + 300);
+        }, 500);
+      }
+    };
+    
+    // Schedule next action (move or stop)
+    const scheduleNextAction = () => {
+      // Don't schedule if welcome sequence is playing, investigating mouse, hovering button, playing message chain, or chasing coderfly
+      if (ariIsPlayingWelcome || ariInvestigatingMouse || isHoveringButton || ariPlayingMessageChain || ariChasingCoderfly) return;
+      
+      const delay = Math.random() * 4000 + 1000; // 1-5 seconds
+      
+      setTimeout(() => {
+        if (ariIsPlayingWelcome || ariInvestigatingMouse || isHoveringButton || ariPlayingMessageChain || ariChasingCoderfly) return; // Check again before acting
+        
+        // 15% chance to tell a joke instead of normal behavior
+        const rand = Math.random();
+        if (rand < 0.15 && ariJokes.length > 0) {
+          tellJoke();
+        } else if (rand < 0.575) {
+          startMoving();
+        } else {
+          stopAndSpeak();
+        }
+      }, delay);
+    };
+    
+    // Randomly change speed while moving
+    setInterval(() => {
+      if (ariMoving && !ariBeingPushed) {
+        const baseSpeed = Math.random() * 4 + 1; // 1-5 base speed
+        const multiplier = getEmotionalSpeedMultiplier();
+        ariSpeed = baseSpeed * multiplier; // Apply emotional modifier
+      }
+    }, 2000);
+    
+    // Check mouse proximity continuously
+    setInterval(() => {
+      checkMouseProximity();
+    }, 100); // Check 10 times per second
+    
+    // Log A.R.I.'s emotional state periodically (for debugging)
+    setInterval(() => {
+      const personality = ariMemory.getPersonalityMode();
+      const trust = ariMemory.getTrustLevel();
+      console.log(`A.R.I. Mood: ${personality} | Trust: ${trust.toFixed(2)} | Pushed: ${ariMemory.pushedCount} | Scared: ${ariMemory.scaredCount} | Ignored: ${ariMemory.ignoredCount}`);
+    }, 10000); // Every 10 seconds
+    
+    // Check if user is idle (mouse not moving) - A.R.I. gets curious!
+    setInterval(() => {
+      const idleTime = Date.now() - lastMouseMoveTime;
+      
+      // Debug log
+      if (idleTime > 8000 && idleTime < 12000 && !ariInvestigatingMouse) {
+        console.log(`Idle check: ${idleTime}ms | investigating: ${ariInvestigatingMouse} | welcome: ${ariIsPlayingWelcome} | pushed: ${ariBeingPushed} | mouseX: ${mouseX}`);
+      }
+      
+      // After 10 seconds of idle, A.R.I. gets curious and investigates
+      if (idleTime > 10000 && !ariInvestigatingMouse && !ariIsPlayingWelcome && !ariBeingPushed && mouseX > 0) {
+        console.log('A.R.I. starting investigation!');
+        ariInvestigatingMouse = true;
+        ariPlayingMessageChain = true; // Mark message chain as active
+        
+        // Become curious (bypass cooldown for investigation)
+        setAriState('curious', false, true);
+        
+        // Say something curious immediately
+        const initialMessage = getInvestigatingMessage();
+        const firstDuration = initialMessage.duration || 3000;
+        setTimeout(() => {
+          showAriBubble(initialMessage.message, firstDuration, 'investigation');
+        }, 500);
+        
+        // Approach the mouse cursor
+        setTimeout(() => {
+          if (ariInvestigatingMouse) {
+            ariTargetX = mouseX + (Math.random() - 0.5) * 100;
+            ariTargetY = mouseY + (Math.random() - 0.5) * 100;
+            ariTargetX = Math.max(50, Math.min(window.innerWidth - 50, ariTargetX));
+            ariTargetY = Math.max(50, Math.min(window.innerHeight - 50, ariTargetY));
+            
+            ariSpeed = 2; // Slow, curious approach
+            ariMoving = true;
+            moveAri();
+          }
+        }, 1500);
+        
+        // Say another curious message
+        setTimeout(() => {
+          if (ariInvestigatingMouse) {
+            const message = getInvestigatingMessage();
+            const secondDuration = message.duration || 3000;
+            setAriState(message.state, false, true);
+            showAriBubble(message.message, secondDuration, 'investigation');
+          }
+        }, 500 + firstDuration); // After first message finishes
+        
+        // After reaching near the mouse, start circling
+        setTimeout(() => {
+          if (ariInvestigatingMouse) {
+            ariCirclingMouse = true;
+            ariSpeed = 1.5;
+            ariCircleAngle = Math.random() * Math.PI * 2; // Random starting angle
+            
+            // Say another curious message while circling
+            setTimeout(() => {
+              if (ariInvestigatingMouse) {
+                const msg = getInvestigatingMessage();
+                const thirdDuration = msg.duration || 3000;
+                setAriState(msg.state, false, true);
+                showAriBubble(msg.message, thirdDuration, 'investigation');
+                
+                // Message chain complete - allow other messages again
+                setTimeout(() => {
+                  ariPlayingMessageChain = false;
+                }, thirdDuration);
+              }
+            }, 2500);
+          }
+        }, 500 + firstDuration + 3000); // After second message finishes (3000ms is approximate second duration)
+      }
+    }, 2000); // Check every 2 seconds
+    
+    // A.R.I. panics when hovering over the button
+    const ariButtonPanic = () => {
+      // Cancel welcome sequence if it's playing
+      if (ariIsPlayingWelcome) {
+        cancelWelcomeSequence();
+      }
+      
+      // Interrupt any message chain - button hover is important interaction
+      ariPlayingMessageChain = false;
+      
+      // Stop normal behaviors
+      ariMoving = false;
+      ariBeingPushed = false;
+      
+      // Set to worried state ONCE and show first warning
+      setAriState('worried', false, true);
+      const warning = getButtonWarningMessage();
+      showAriBubble(warning.message, 5000, 'button'); // Show for 5 seconds
+      
+      // Start shivering - capture original position
+      let shiverOffset = 0;
+      const originalX = ariX;
+      const originalY = ariY;
+      let hasCalmedDown = false;
+      let idleCheckCounter = 0;
+      const idleThreshold = 500; // ~8 seconds (500 frames at 16ms)
+      
+      // Loop worried animation without sound - manual frame cycling
+      let animFrameIndex = 0;
+      const worriedFrames = ariAnimations.worried_entry || ['<(o-o)>', '<(o_O)>', '<(O_o)>', '<(o_O)>'];
+      
+      const animLoopInterval = setInterval(() => {
+        if (!isHoveringButton) {
+          clearInterval(animLoopInterval);
+          return;
+        }
+        
+        // Only animate if not calmed down
+        if (!hasCalmedDown) {
+          // Cycle through animation frames
+          ariElement.textContent = worriedFrames[animFrameIndex];
+          animFrameIndex = (animFrameIndex + 1) % worriedFrames.length;
+        }
+      }, 250); // 250ms per frame (4 fps) - same as entry animations
+      
+      shiverInterval = setInterval(() => {
+        if (!isHoveringButton) {
+          // Stop shivering when not hovering
+          clearInterval(shiverInterval);
+          shiverInterval = null;
+          // Return to original position
+          ariElement.style.left = originalX + 'px';
+          ariElement.style.top = originalY + 'px';
+          return;
+        }
+        
+        // Shiver effect - aggressive random shaking (but only if not calmed down)
+        shiverOffset++;
+        
+        // Check if mouse has been idle while hovering
+        const timeSinceMouseMove = Date.now() - lastMouseMoveTime;
+        if (!hasCalmedDown && timeSinceMouseMove > 8000) { // 8 seconds of no movement
+          hasCalmedDown = true;
+          
+          // Stop shivering
+          ariElement.style.left = originalX + 'px';
+          ariElement.style.top = originalY + 'px';
+          
+          // Calm down and make relieved comment
+          setAriState('confused', false, true);
+          
+          const relievedMessages = [
+            'uhm.. ph3ww... 1 str3ss3d 0ut f0r n0th1ng 1t s33ms h@h@',
+            'w@1t... @r3 y0u st1ll th3r3?',
+            'uhh.. y0u\'r3 n0t m0v1ng...',
+            'h3h... f@ls3 @l@rm 1 gu3ss',
+            'th@t w@s... 3mb@rr@ss1ng',
+            '0k@y... m@yb3 y0u w0n\'t pr3ss 1t?'
+          ];
+          
+          const message = relievedMessages[Math.floor(Math.random() * relievedMessages.length)];
+          showAriBubble(message, 4000);
+          
+          // After a moment, get curious
+          setTimeout(() => {
+            if (!isHoveringButton) return;
+            
+            setAriState('curious', false, true);
+            
+            const curiousMessages = [
+              'why @r3n\'t y0u m0v1ng th0ugh?',
+              'h3ll0...? st1ll th3r3?',
+              '@r3 y0u... fr0z3n?',
+              'th1s 1s w31rd...',
+              'sh0uld 1 b3 w0rr13d @g@1n?'
+            ];
+            
+            const curiousMsg = curiousMessages[Math.floor(Math.random() * curiousMessages.length)];
+            showAriBubble(curiousMsg, 4000);
+          }, 4500);
+          
+          return; // Stop shivering
+        }
+        
+        if (!hasCalmedDown) {
+          const shakeX = (Math.random() - 0.5) * 12; // Random shake between -6 and 6
+          const shakeY = (Math.random() - 0.5) * 12;
+          
+          // Apply shake to visual position only (don't update ariX/ariY)
+          ariElement.style.left = (originalX + shakeX) + 'px';
+          ariElement.style.top = (originalY + shakeY) + 'px';
+        }
+        
+        // Show another warning message every 6 seconds (360 frames at 16ms each) - only if not calmed
+        if (!hasCalmedDown && shiverOffset % 360 === 0) {
+          const newWarning = getButtonWarningMessage();
+          showAriBubble(newWarning.message, 5000, 'button'); // Don't change state, just show message
+        }
+      }, 16); // ~60fps for smooth shiver
+    };
+    
+    // A.R.I. shows relief when mouse leaves button
+    const ariButtonRelief = () => {
+      // Show relief message
+      setAriState('happy', false, true);
+      
+      const reliefMessages = [
+        'ph3ww... th@t w@s cl0s3',
+        '*s1gh* th@nk c0d3...',
+        '0k@y... 1\'m 0k@y... 3v3ryth1ng 1s f1n3',
+        'th0ught y0u w3r3 g01ng t0 d0 1t...',
+        '1 c@n br3@th3 @g@1n',
+        'cr1s1s @v3rt3d!'
+      ];
+      
+      const message = reliefMessages[Math.floor(Math.random() * reliefMessages.length)];
+      showAriBubble(message, 3500);
+      
+      // After showing relief, return to normal behavior
+      setTimeout(() => {
+        scheduleNextAction();
+      }, 3500);
+    };
+    
+    // A.R.I. panic and fly off screen when button is clicked
+    const ariPanicFlyOff = () => {
+      // Stop all current behaviors including shivering
+      if (shiverInterval) {
+        clearInterval(shiverInterval);
+        shiverInterval = null;
+      }
+      
+      ariInvestigatingMouse = false;
+      ariCirclingMouse = false;
+      ariMoving = false;
+      ariBeingPushed = false;
+      
+      // Set to shocked/error state
+      setAriState('error', false, true);
+      
+      // Show panic bubble that follows A.R.I.
+      const panicBubble = document.createElement('div');
+      panicBubble.style.position = 'fixed';
+      panicBubble.style.fontFamily = 'Press Start 2P, monospace';
+      panicBubble.style.fontSize = '16px';
+      panicBubble.style.color = '#ff0000';
+      panicBubble.style.textShadow = '0 0 10px #ff0000, 0 0 20px #ff0000';
+      panicBubble.style.zIndex = '10001';
+      panicBubble.style.pointerEvents = 'none';
+      panicBubble.style.whiteSpace = 'nowrap';
+      panicBubble.textContent = 'AAAAAAAAAAAH!!!!!';
+      document.body.appendChild(panicBubble);
+      
+      // Get button position
+      const gameButton = document.querySelector('.game-button');
+      const buttonRect = gameButton.getBoundingClientRect();
+      const buttonCenterX = buttonRect.left + buttonRect.width / 2;
+      const buttonCenterY = buttonRect.top + buttonRect.height / 2;
+      
+      // Calculate direction away from button (opposite to A.R.I.'s position)
+      const dirX = ariX - buttonCenterX;
+      const dirY = ariY - buttonCenterY;
+      const distance = Math.sqrt(dirX * dirX + dirY * dirY);
+      
+      // Normalize direction and extend far off screen
+      const normalizedX = dirX / distance;
+      const normalizedY = dirY / distance;
+      
+      // Calculate off-screen target (2000 pixels away in the opposite direction)
+      const targetDirection = {
+        x: ariX + normalizedX * 2000,
+        y: ariY + normalizedY * 2000
+      };
+      
+      // Determine spin direction based on which side of the screen A.R.I. is on
+      // Imaginary vertical line at center of screen
+      const screenCenterX = window.innerWidth / 2;
+      const spinDirection = ariX > screenCenterX ? 1 : -1; // Right side: clockwise (+1), Left side: counter-clockwise (-1)
+      
+      console.log(`[A.R.I. Ejection] Position: ${ariX.toFixed(0)}px, Screen center: ${screenCenterX.toFixed(0)}px, Spin: ${spinDirection > 0 ? 'Clockwise' : 'Counter-clockwise'}`);
+      
+      // Start spinning and flying
+      let spinAngle = 0;
+      const startTime = Date.now();
+      const duration = 2500; // 2.5 seconds to fly off
+      
+      const panicAnimation = () => {
+        const elapsed = Date.now() - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Easing function for acceleration
+        const easeInQuad = progress * progress;
+        
+        // Update A.R.I. position
+        ariX = ariX + (targetDirection.x - ariX) * easeInQuad * 0.1;
+        ariY = ariY + (targetDirection.y - ariY) * easeInQuad * 0.1;
+        
+        // Spin faster and faster (direction depends on screen position)
+        // Right side: clockwise (+), Left side: counter-clockwise (-)
+        const spinSpeed = (5 + (progress * 20)) * spinDirection; // Start at 5deg/frame, accelerate to 25deg/frame
+        spinAngle += spinSpeed;
+        
+        ariElement.style.left = ariX + 'px';
+        ariElement.style.top = ariY + 'px';
+        ariElement.style.transform = `rotate(${spinAngle}deg)`;
+        
+        // Update panic bubble position to follow A.R.I.
+        panicBubble.style.left = (ariX + 60) + 'px';
+        panicBubble.style.top = (ariY - 30) + 'px';
+        
+        if (progress < 1) {
+          requestAnimationFrame(panicAnimation);
+        } else {
+          // Remove panic bubble when done
+          panicBubble.remove();
+        }
+      };
+      
+      panicAnimation();
+    };
+    
+    // ===== CODERFLY SYSTEM =====
+    const coderflyElement = document.getElementById('coderfly');
+    const scoreBoard = document.getElementById('scoreBoard');
+    const userScoreElement = document.getElementById('userScore');
+    const ariScoreElement = document.getElementById('ariScore');
+    const scoreBoardFly = document.getElementById('scoreBoardFly');
+    const scoreBoardFly2 = document.getElementById('scoreBoardFly2');
+    
+    // Score tracking
+    let userCatchCount = 0;
+    let ariCatchCount = 0;
+    let gameStarted = false;
+    let gameOnCooldown = false;
+    let isFirstCoderfly = true; // Track if this is the first coderfly ever
+    let coderflySpawnTime = 0; // Track when coderfly spawned for detection delay
+    const WINNING_SCORE = 10;
+    const COOLDOWN_TIME = 600000; // 10 minutes in milliseconds
+    const ARI_DETECTION_DELAY = 1250; // 1.25 seconds for non-first coderflies
+    
+    // Animate score board coderflies
+    let scoreBoardFlyFrame = 0;
+    setInterval(() => {
+      if (scoreBoard.style.display === 'block') {
+        scoreBoardFlyFrame = (scoreBoardFlyFrame + 1) % coderflyFrames.length;
+        scoreBoardFly.textContent = coderflyFrames[scoreBoardFlyFrame];
+        scoreBoardFly2.textContent = coderflyFrames[scoreBoardFlyFrame];
+      }
+    }, 300);
+    
+    // Coderfly animation frames (updated to 2-frame loop)
+    const coderflyFrames = ['⸌(•)⸍', '⸍(•)⸌'];
+    let coderflyX = 0;
+    let coderflyY = 0;
+    let coderflyTargetX = 0;
+    let coderflyTargetY = 0;
+    let coderflySpeed = 1.5;
+    let coderflyCurrentFrame = 0;
+    let coderflyActive = false;
+    let coderflyAnimationInterval = null;
+    let ariChasingCoderfly = false;
+    
+    // Generate random bright colors (no black/dark colors)
+    const getRandomBrightColor = () => {
+      const colors = [
+        '#FF1493', // Deep Pink
+        '#00FF00', // Lime
+        '#00FFFF', // Cyan
+        '#FF00FF', // Magenta
+        '#FFD700', // Gold
+        '#FF6347', // Tomato
+        '#7FFF00', // Chartreuse
+        '#FF69B4', // Hot Pink
+        '#00CED1', // Dark Turquoise
+        '#FF4500', // Orange Red
+        '#ADFF2F', // Green Yellow
+        '#FF1FF0', // Purple/Pink
+        '#1E90FF', // Dodger Blue
+        '#FF8C00', // Dark Orange
+        '#00FA9A', // Medium Spring Green
+        '#FF00AA', // Bright Pink
+        '#FFFF00', // Yellow
+        '#00BFFF'  // Deep Sky Blue
+      ];
+      return colors[Math.floor(Math.random() * colors.length)];
+    };
+    
+    // Spawn coderfly at random position and move across screen
+    const spawnCoderfly = () => {
+      if (coderflyActive || ariChasingCoderfly || gameOnCooldown) return; // Don't spawn if one is active, A.R.I. is chasing, or game is on cooldown
+      
+      console.log('[Coderfly] Spawning!');
+      coderflyActive = true;
+      coderflySpawnTime = Date.now(); // Track when it spawned
+      
+      // First coderfly - A.R.I. announces the game!
+      if (isFirstCoderfly) {
+        console.log('[A.R.I.] FIRST CODERFLY - INSTANT CHASE!');
+        isFirstCoderfly = false;
+        // DON'T set gameStarted yet - only when A.R.I. catches it!
+        
+        // Stop whatever he was doing
+        ariInvestigatingMouse = false;
+        ariIsPlayingWelcome = false;
+        ariCirclingMouse = false;
+        ariBeingPushed = false;
+        
+        // Quick reaction and OBSESSIVE chase
+        setAriState('surprised', false, true);
+        showAriBubble('0H! @ C0D3RFLY!!!', 3000, 'coderfly');
+        
+        // SNAP TO IT - A.R.I. is obsessed with the first coderfly!
+        ariChasingCoderfly = true;
+        ariMoving = true;
+        
+        // Aggressive chase function - constantly update target to coderfly position
+        const aggressiveChase = () => {
+          if (!coderflyActive || !ariChasingCoderfly) return;
+          
+          // Snap target directly to coderfly (no randomness)
+          ariTargetX = coderflyX;
+          ariTargetY = coderflyY;
+          ariSpeed = 12; // SUPER FAST for first catch!
+          
+          // Check if caught (within 40px)
+          const catchDistance = Math.sqrt(Math.pow(coderflyX - ariX, 2) + Math.pow(coderflyY - ariY, 2));
+          
+          if (catchDistance < 40) {
+            console.log('[A.R.I.] CAUGHT FIRST CODERFLY!');
+            catchCoderfly();
+            return;
+          }
+          
+          // Keep chasing aggressively
+          moveAri();
+          requestAnimationFrame(aggressiveChase);
+        };
+        
+        aggressiveChase(); // Start aggressive chase immediately!
+        
+        // Show challenge messages WHILE he's already moving and chasing
+        setTimeout(() => {
+          setAriState('happy', false, true);
+          showAriBubble(`F1RST T0 C@TCH ${WINNING_SCORE} W1NS!`, 3000, 'coderfly');
+          
+          setTimeout(() => {
+            setAriState('happy', false, true);
+            showAriBubble('G3T R3@DY T0 L0S3! >:D', 2500, 'coderfly');
+          }, 3200);
+        }, 3200);
+      }
+      
+      // Set random bright color
+      const color = getRandomBrightColor();
+      coderflyElement.style.color = color;
+      coderflyElement.style.textShadow = `0 0 10px ${color}`;
+      
+      // Random spawn from one edge - BARELY inside viewport so they're visible
+      const spawnSide = Math.floor(Math.random() * 4); // 0=top, 1=right, 2=bottom, 3=left
+      const margin = 20; // Small margin from edge
+      
+      switch(spawnSide) {
+        case 0: // Top edge
+          coderflyX = Math.random() * (window.innerWidth - margin * 2) + margin;
+          coderflyY = margin;
+          coderflyTargetX = Math.random() * (window.innerWidth - margin * 2) + margin;
+          coderflyTargetY = window.innerHeight - margin;
+          break;
+        case 1: // Right edge
+          coderflyX = window.innerWidth - margin;
+          coderflyY = Math.random() * (window.innerHeight - margin * 2) + margin;
+          coderflyTargetX = margin;
+          coderflyTargetY = Math.random() * (window.innerHeight - margin * 2) + margin;
+          break;
+        case 2: // Bottom edge
+          coderflyX = Math.random() * (window.innerWidth - margin * 2) + margin;
+          coderflyY = window.innerHeight - margin;
+          coderflyTargetX = Math.random() * (window.innerWidth - margin * 2) + margin;
+          coderflyTargetY = margin;
+          break;
+        case 3: // Left edge
+          coderflyX = margin;
+          coderflyY = Math.random() * (window.innerHeight - margin * 2) + margin;
+          coderflyTargetX = window.innerWidth - margin;
+          coderflyTargetY = Math.random() * (window.innerHeight - margin * 2) + margin;
+          break;
+      }
+      
+      coderflyElement.style.left = coderflyX + 'px';
+      coderflyElement.style.top = coderflyY + 'px';
+      coderflyElement.style.display = 'block';
+      
+      // For first coderfly, make it uncatchable by user - A.R.I. must get it first!
+      // For subsequent coderflies, add click handler for user to catch it
+      if (isFirstCoderfly) {
+        coderflyElement.onclick = null; // Disable clicking on first coderfly
+        coderflyElement.style.pointerEvents = 'none';
+      } else {
+        coderflyElement.onclick = userCatchCoderfly;
+        coderflyElement.style.pointerEvents = 'auto';
+      }
+      
+      // Start animation
+      coderflyCurrentFrame = 0;
+      coderflyAnimationInterval = setInterval(() => {
+        coderflyCurrentFrame = (coderflyCurrentFrame + 1) % coderflyFrames.length;
+        coderflyElement.textContent = coderflyFrames[coderflyCurrentFrame];
+      }, 150); // ~6.5fps for wing flapping
+      
+      moveCoderfly();
+    };
+    
+    // Move coderfly toward target
+    const moveCoderfly = () => {
+      if (!coderflyActive) return;
+      
+      // Calculate direction to target
+      const dx = coderflyTargetX - coderflyX;
+      const dy = coderflyTargetY - coderflyY;
+      const distance = Math.sqrt(dx * dx + dy * dy);
+      
+      // Check if A.R.I. notices coderfly (LARGE detection range - A.R.I. is very alert!)
+      // BUT add 1.25 second delay for non-first coderflies to give user a chance
+      const timeSinceSpawn = Date.now() - coderflySpawnTime;
+      const canDetect = gameStarted ? timeSinceSpawn >= ARI_DETECTION_DELAY : true; // No delay for first coderfly
+      
+      const ariDist = Math.sqrt(Math.pow(coderflyX - ariX, 2) + Math.pow(coderflyY - ariY, 2));
+      if (canDetect && ariDist < 500 && !ariChasingCoderfly && !ariInvestigatingMouse && !isHoveringButton && !ariIsPlayingWelcome && !ariPlayingMessageChain) {
+        console.log('[A.R.I.] Noticed coderfly at distance:', ariDist.toFixed(0), 'after', timeSinceSpawn, 'ms');
+        ariNoticeCoderfly();
+        return;
+      }
+      
+      // If reached target or off screen, despawn
+      if (distance < 10 || coderflyX < -100 || coderflyX > window.innerWidth + 100 || coderflyY < -100 || coderflyY > window.innerHeight + 100) {
+        despawnCoderfly();
+        return;
+      }
+      
+      // Move toward target
+      coderflyX += (dx / distance) * coderflySpeed;
+      coderflyY += (dy / distance) * coderflySpeed;
+      
+      coderflyElement.style.left = coderflyX + 'px';
+      coderflyElement.style.top = coderflyY + 'px';
+      
+      requestAnimationFrame(moveCoderfly);
+    };
+    
+    // Despawn coderfly
+    const despawnCoderfly = () => {
+      console.log('[Coderfly] Despawning');
+      coderflyActive = false;
+      coderflyElement.style.display = 'none';
+      if (coderflyAnimationInterval) {
+        clearInterval(coderflyAnimationInterval);
+        coderflyAnimationInterval = null;
+      }
+      
+      // Schedule next spawn (random 8-15 seconds for active gameplay)
+      const nextSpawn = Math.random() * 7000 + 8000;
+      setTimeout(spawnCoderfly, nextSpawn);
+    };
+    
+    // A.R.I. notices and chases coderfly
+    const ariNoticeCoderfly = (isFirstCatch = false) => {
+      ariChasingCoderfly = true;
+      ariInvestigatingMouse = false; // Stop investigating mouse
+      ariCirclingMouse = false;
+      ariPlayingMessageChain = false; // Can interrupt message chains
+      
+      // For first coderfly, skip the reaction message and go straight to chasing
+      if (isFirstCatch) {
+        console.log('[A.R.I.] Going for first coderfly - FAST CHASE!');
+        chaseCoderfly(true); // Pass true for turbo speed
+        return;
+      }
+      
+      // Normal coderfly reaction - quick messages, start chasing fast!
+      const reactions = [
+        { state: 'surprised', message: 'Wh0@!', duration: 800 },
+        { state: 'curious', message: '*_*', duration: 700 },
+        { state: 'happy', message: 'M1N3!', duration: 800 },
+        { state: 'happy', message: 'G0t 1t!', duration: 700 }
+      ];
+      
+      const reaction = reactions[Math.floor(Math.random() * reactions.length)];
+      setAriState(reaction.state, false, true);
+      showAriBubble(reaction.message, reaction.duration, 'coderfly');
+      
+      // Start chasing almost immediately (300ms after spotting)
+      setTimeout(() => {
+        chaseCoderfly();
+      }, 300);
+    };
+    
+    // A.R.I. chases the coderfly
+    const chaseCoderfly = (turboMode = false) => {
+      if (!ariChasingCoderfly || !coderflyActive) {
+        ariChasingCoderfly = false;
+        return;
+      }
+      
+      // Set target to coderfly position with slight randomness
+      ariTargetX = coderflyX + (Math.random() - 0.5) * 50;
+      ariTargetY = coderflyY + (Math.random() - 0.5) * 50;
+      ariSpeed = turboMode ? 8 : 4; // Turbo speed for first catch, normal fast chase otherwise
+      ariMoving = true;
+      
+      // Check if caught (within 30px)
+      const catchDistance = Math.sqrt(Math.pow(coderflyX - ariX, 2) + Math.pow(coderflyY - ariY, 2));
+      
+      if (catchDistance < 30) {
+        catchCoderfly();
+        return;
+      }
+      
+      // Check if coderfly escaped (too far or despawned)
+      if (!coderflyActive || catchDistance > 500) {
+        missCoderfly();
+        return;
+      }
+      
+      setTimeout(() => {
+        if (ariChasingCoderfly) {
+          moveAri(); // Restart movement loop if needed
+          chaseCoderfly(turboMode); // Continue chasing with same speed mode
+        }
+      }, 100);
+    };
+    
+    // Check if someone won the game
+    const checkWinner = () => {
+      if (ariCatchCount >= WINNING_SCORE) {
+        // A.R.I. wins!
+        console.log('[Game] A.R.I. WINS!');
+        gameOnCooldown = true;
+        ariPlayingMessageChain = true; // Prevent interruptions
+        
+        const winMessages = [
+          { state: 'happy', message: `${WINNING_SCORE} C0D3RFL13S! 1 W1N!!! >:D`, duration: 4000 },
+          { state: 'annoyed', message: `T0LD Y0U 1'M B3TT3R @T TH1S`, duration: 3500 },
+          { state: 'happy', message: `Ez g@m3, 3z l1f3... ${ariCatchCount}-${userCatchCount} lm@0`, duration: 4000 }
+        ];
+        
+        const msg = winMessages[Math.floor(Math.random() * winMessages.length)];
+        setAriState(msg.state, false, true);
+        showAriBubble(msg.message, msg.duration, 'coderfly');
+        
+        // Reset game after message
+        setTimeout(() => {
+          resetGame();
+        }, msg.duration + 1000);
+        
+        return true;
+      } else if (userCatchCount >= WINNING_SCORE) {
+        // User wins!
+        console.log('[Game] USER WINS!');
+        gameOnCooldown = true;
+        ariPlayingMessageChain = true; // Prevent interruptions
+        
+        const loseMessages = [
+          { state: 'angry', message: `${WINNING_SCORE}?! TH1S 1S CH3@T1NG!!!`, duration: 4000 },
+          { state: 'sad', message: `${userCatchCount}-${ariCatchCount}... 1 l0st... h0w?!`, duration: 4000 },
+          { state: 'shocked', message: `N0 W@Y! Y0U MU$T B3 US1NG H@CKS!`, duration: 4000 },
+          { state: 'annoyed', message: `1 D3M@ND @ R3M@TCH! ...1n 10 m1nut3s`, duration: 4500 }
+        ];
+        
+        const msg = loseMessages[Math.floor(Math.random() * loseMessages.length)];
+        setAriState(msg.state, false, true);
+        showAriBubble(msg.message, msg.duration, 'coderfly');
+        
+        // Reset game after message
+        setTimeout(() => {
+          resetGame();
+        }, msg.duration + 1000);
+        
+        return true;
+      }
+      return false;
+    };
+    
+    // Reset game and start cooldown
+    const resetGame = () => {
+      console.log('[Game] Resetting... 10 minute cooldown started');
+      userCatchCount = 0;
+      ariCatchCount = 0;
+      userScoreElement.textContent = '0';
+      ariScoreElement.textContent = '0';
+      scoreBoard.style.display = 'none';
+      gameStarted = false;
+      isFirstCoderfly = true; // Reset for next game
+      ariPlayingMessageChain = false;
+      
+      // Start 10-minute cooldown
+      setTimeout(() => {
+        console.log('[Game] Cooldown ended! Ready for new game');
+        gameOnCooldown = false;
+        // First coderfly will spawn 10-20 seconds after cooldown ends
+        setTimeout(() => {
+          spawnCoderfly();
+        }, Math.random() * 10000 + 10000);
+      }, COOLDOWN_TIME);
+    };
+    
+    // A.R.I. catches the coderfly
+    const catchCoderfly = () => {
+      console.log('[A.R.I.] Caught coderfly!');
+      ariChasingCoderfly = false;
+      
+      // Increment A.R.I.'s score
+      ariCatchCount++;
+      ariScoreElement.textContent = ariCatchCount;
+      
+      // Show score board after first catch
+      if (ariCatchCount === 1 && userCatchCount === 0) {
+        console.log('[Score Board] Displaying after first catch!');
+        gameStarted = true; // Game officially starts now!
+        scoreBoard.style.display = 'block';
+      }
+      
+      // Despawn coderfly
+      despawnCoderfly();
+      
+      // Check for winner first
+      if (checkWinner()) return;
+      
+      // Special message for first catch
+      if (ariCatchCount === 1 && userCatchCount === 0) {
+        const firstCatchMsg = { state: 'happy', message: '1-0! 1\'M @LR3@DY W1NN1NG! >:D' };
+        setAriState(firstCatchMsg.state, false, true);
+        showAriBubble(firstCatchMsg.message, 3000, 'coderfly');
+        
+        // Set message chain flag
+        ariPlayingMessageChain = true;
+        setTimeout(() => {
+          ariPlayingMessageChain = false;
+          scheduleNextAction();
+        }, 3500);
+        return;
+      }
+      
+      // Competitive dialogue based on score comparison
+      let msg;
+      const scoreDiff = ariCatchCount - userCatchCount;
+      
+      if (scoreDiff > 2) {
+        // A.R.I. is way ahead - very dismissive/bragging
+        const bigLeadMessages = [
+          { state: 'happy', message: `H@h@! Th@t's ${ariCatchCount}! Y0u'r3 w@y b3h1nd, sl0wp0k3` },
+          { state: 'annoyed', message: `${ariCatchCount} vs ${userCatchCount}... @r3 y0u 3v3n try1ng?` },
+          { state: 'happy', message: `*y@wn* t00 3@sy... ${ariCatchCount} f0r m3!` },
+          { state: 'neutral', message: `${ariCatchCount}. 1'm 0n f1r3 t0d@y lm@0` }
+        ];
+        msg = bigLeadMessages[Math.floor(Math.random() * bigLeadMessages.length)];
+      } else if (scoreDiff > 0) {
+        // A.R.I. is slightly ahead - confident
+        const smallLeadMessages = [
+          { state: 'happy', message: `G0t 1t! Th@t's ${ariCatchCount} f0r m3 n0w` },
+          { state: 'happy', message: `St1ll @h3@d! ${ariCatchCount} vs ${userCatchCount} >:)` },
+          { state: 'neutral', message: `${ariCatchCount}... k33p1ng my l3@d` }
+        ];
+        msg = smallLeadMessages[Math.floor(Math.random() * smallLeadMessages.length)];
+      } else if (scoreDiff === 0) {
+        // Tied - competitive
+        const tiedMessages = [
+          { state: 'annoyed', message: `${ariCatchCount}! W3'r3 t13d... n0t f0r l0ng` },
+          { state: 'happy', message: `${ariCatchCount} 3@ch! L3t's s33 wh0 g3ts th3 n3xt 0n3` },
+          { state: 'shocked', message: `Ugh, y0u c@ught up! ${ariCatchCount}-${ariCatchCount}` }
+        ];
+        msg = tiedMessages[Math.floor(Math.random() * tiedMessages.length)];
+      } else {
+        // User is ahead - should not happen here, but just in case
+        const behindMessages = [
+          { state: 'annoyed', message: `${ariCatchCount}... th1s 1s r1gg3d!` },
+          { state: 'sad', message: `${ariCatchCount}... but st1ll b3h1nd >:(` }
+        ];
+        msg = behindMessages[Math.floor(Math.random() * behindMessages.length)];
+      }
+      
+      setAriState(msg.state, false, true);
+      showAriBubble(msg.message, 3500, 'coderfly');
+      
+      // Set message chain flag to prevent interruption
+      ariPlayingMessageChain = true;
+      
+      // Return to normal behavior after message finishes
+      setTimeout(() => {
+        ariPlayingMessageChain = false;
+        scheduleNextAction();
+      }, 4000);
+    };
+    
+    // A.R.I. loses the coderfly
+    const missCoderfly = () => {
+      console.log('[A.R.I.] Lost coderfly');
+      ariChasingCoderfly = false;
+      
+      // Show disappointed message
+      const missMessages = [
+        { state: 'sad', message: '@ww... 1t g0t @w@y' },
+        { state: 'annoyed', message: 'Gr... t00 f@st' },
+        { state: 'confused', message: 'Wh3r3 d1d 1t g0?' }
+      ];
+      
+      const msg = missMessages[Math.floor(Math.random() * missMessages.length)];
+      setAriState(msg.state, false, true);
+      showAriBubble(msg.message, 2500, 'coderfly');
+      
+      // Set message chain flag to prevent interruption
+      ariPlayingMessageChain = true;
+      
+      // Return to normal behavior
+      setTimeout(() => {
+        ariPlayingMessageChain = false;
+        scheduleNextAction();
+      }, 3500);
+    };
+    
+    // User catches the coderfly by clicking it
+    const userCatchCoderfly = (event) => {
+      if (!coderflyActive) return;
+      
+      event.stopPropagation();
+      console.log('[User] Caught coderfly!');
+      
+      // If user somehow catches the FIRST coderfly, A.R.I. gets annoyed and cancels the game
+      if (userCatchCount === 0 && ariCatchCount === 0) {
+        console.log('[Game] User caught first coderfly - A.R.I. cancels game!');
+        
+        // Stop A.R.I. from chasing
+        ariChasingCoderfly = false;
+        ariPlayingMessageChain = true;
+        
+        // Despawn coderfly
+        coderflyActive = false;
+        coderflyElement.style.display = 'none';
+        if (coderflyAnimationInterval) {
+          clearInterval(coderflyAnimationInterval);
+          coderflyAnimationInterval = null;
+        }
+        
+        // A.R.I.'s dismissive reaction
+        setAriState('annoyed', false, true);
+        showAriBubble('Ugh... y0u\'r3 n0 fun', 2500, 'coderfly');
+        
+        setTimeout(() => {
+          setAriState('sad', false, true);
+          showAriBubble('1 d0n\'t w@nn@ pl@y @nym0r3 >:(', 3000, 'coderfly');
+          
+          setTimeout(() => {
+            setAriState('neutral', false, true);
+            showAriBubble('...m@yb3 l@t3r', 2500, 'coderfly');
+            
+            setTimeout(() => {
+              ariPlayingMessageChain = false;
+              
+              // 2-minute cooldown before A.R.I. suggests playing again
+              gameOnCooldown = true;
+              isFirstCoderfly = true; // Reset for next attempt
+              
+              console.log('[Game] 2-minute cooldown started (user caught first coderfly)');
+              setTimeout(() => {
+                console.log('[Game] Cooldown ended - A.R.I. ready to try again');
+                gameOnCooldown = false;
+                
+                // A.R.I. suggests playing again
+                setAriState('curious', false, true);
+                showAriBubble('W@nn@ try th@t g@m3 @g@1n?', 3000, 'coderfly');
+                
+                // Schedule first coderfly
+                setTimeout(() => {
+                  spawnCoderfly();
+                }, Math.random() * 10000 + 10000);
+              }, 120000); // 2 minutes
+              
+              scheduleNextAction();
+            }, 2700);
+          }, 3200);
+        }, 2700);
+        
+        return;
+      }
+      
+      // Stop A.R.I. from chasing if he was
+      if (ariChasingCoderfly) {
+        ariChasingCoderfly = false;
+      }
+      
+      // Increment user score
+      userCatchCount++;
+      userScoreElement.textContent = userCatchCount;
+      
+      // Despawn coderfly
+      despawnCoderfly();
+      
+      // Check for winner first
+      if (checkWinner()) return;
+      
+      // A.R.I.'s salty/competitive reaction based on score
+      let msg;
+      const scoreDiff = ariCatchCount - userCatchCount;
+      
+      if (scoreDiff > 1) {
+        // A.R.I. still way ahead - dismissive
+        const stillAheadMessages = [
+          { state: 'annoyed', message: `Wh@t3v3r... 1 st1ll h@v3 ${ariCatchCount}` },
+          { state: 'neutral', message: `N1c3... but 1'm @t ${ariCatchCount} @lr3@dy lm@0` },
+          { state: 'happy', message: `${userCatchCount}? Th@t's cut3. 1'm @t ${ariCatchCount}` },
+          { state: 'annoyed', message: `*y@wn* ${ariCatchCount}-${userCatchCount}. St1ll w1nn1ng` }
+        ];
+        msg = stillAheadMessages[Math.floor(Math.random() * stillAheadMessages.length)];
+      } else if (scoreDiff === 1) {
+        // A.R.I. barely ahead - getting nervous
+        const barelyAheadMessages = [
+          { state: 'worried', message: `H3y! St0p g3tt1ng s0 cl0s3!` },
+          { state: 'annoyed', message: `${ariCatchCount}-${userCatchCount}... b@r3ly` },
+          { state: 'shocked', message: `W@1t, sl0w d0wn!` }
+        ];
+        msg = barelyAheadMessages[Math.floor(Math.random() * barelyAheadMessages.length)];
+      } else if (scoreDiff === 0) {
+        // Tied - panicking
+        const tiedMessages = [
+          { state: 'shocked', message: `N0! W3'r3 t13d @g@1n!` },
+          { state: 'annoyed', message: `${userCatchCount}-${userCatchCount}... th1s 1s bull$#!t` },
+          { state: 'worried', message: `H0w @r3 y0u k33p1ng up?!` }
+        ];
+        msg = tiedMessages[Math.floor(Math.random() * tiedMessages.length)];
+      } else if (scoreDiff === -1) {
+        // User barely ahead - conspiracy theories start
+        const barelyBehindMessages = [
+          { state: 'annoyed', message: `Th1s g@m3 1s r1gg3d!!!` },
+          { state: 'shocked', message: `H0w?! @r3 y0u ch3@t1ng?!` },
+          { state: 'confused', message: `W@1t... @r3 y0u us1ng h@cks?` },
+          { state: 'annoyed', message: `Y0ur m0us3 1s cl3@rly m0dd3d` }
+        ];
+        msg = barelyBehindMessages[Math.floor(Math.random() * barelyBehindMessages.length)];
+      } else {
+        // User way ahead - full conspiracy mode
+        const wayBehindMessages = [
+          { state: 'angry', message: `${userCatchCount}?! D3f1n1t3ly ch3@t1ng!` },
+          { state: 'annoyed', message: `1 c@ll h@cks! Th3 c0d3rfl13s l1k3 y0u m0r3!` },
+          { state: 'shocked', message: `Th3 syst3m 1s @g@1nst m3!` },
+          { state: 'sad', message: `${ariCatchCount}-${userCatchCount}... 1 qu1t. Th1s 1s unf@1r` },
+          { state: 'annoyed', message: `Th3y'r3 OBVI0USLY fl31ng t0w@rds y0u!` },
+          { state: 'confused', message: `@r3 y0u... p@y1ng th3m?!` }
+        ];
+        msg = wayBehindMessages[Math.floor(Math.random() * wayBehindMessages.length)];
+      }
+      
+      setAriState(msg.state, false, true);
+      showAriBubble(msg.message, 3500, 'coderfly');
+      
+      // Set message chain flag to prevent interruption
+      ariPlayingMessageChain = true;
+      setTimeout(() => {
+        ariPlayingMessageChain = false;
+      }, 4000);
+    };
+    
+    // Start coderfly spawning system (first spawn after 10-20 seconds)
+    setTimeout(() => {
+      spawnCoderfly();
+    }, Math.random() * 10000 + 10000);
+    
+    // Start A.R.I. with welcome sequence on page load
+    setTimeout(() => {
+      playWelcomeSequence();
+    }, 1500);
   </script>
 </body>
 </html>

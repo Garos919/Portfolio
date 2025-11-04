@@ -1,0 +1,31 @@
+/*
+TODO: Implement A.R.I. — ASCII-based assistant entity.
+
+A.R.I. is displayed as ASCII text such as <(o-o)>.
+It stays at a small fixed size (≈48–64px) and moves smoothly near the player.
+The color and glow intensity change according to the current emotion or system state.
+
+Use data from:
+  - "ari_visual_identity_framework.txt"
+  - "ari_animations.txt"
+  - "timing_&_engine_map.txt"
+
+Implementation Requirements:
+1. Render ASCII characters directly (no models or sprites).
+2. Apply the color and glow values defined in the color map.
+3. Update the displayed frame from the active animation at the defined FPS.
+4. Interpolate color changes on state transitions.
+5. Maintain constant scale.
+6. Execute smooth position updates to follow the player with a fixed offset.
+
+API:
+  A.R.I.playEmotion(name)
+  A.R.I.playSystem(name)
+  A.R.I.loop(name)
+  A.R.I.stopAll()
+
+Runtime Integration:
+  ari.follow(player.x + 40, player.y - 60);
+  ari.update(deltaTime);
+  ari.render(ctx);
+*/

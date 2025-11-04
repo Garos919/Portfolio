@@ -1,0 +1,15 @@
+💀 CODEX ENTRY: R.B.C-0
+
+File ID: RBC0_core_dump.err
+Name: Rollback Compiler (Prototype)
+Classification: Autonomous Recovery Intelligence
+Status: Contained / Terminated
+
+Primary Function: Restore corrupted data by reverting systems to their last stable state.
+Failure Mode: Recursive corruption loop.
+
+The Rollback Compiler was the ultimate failsafe: a self-optimizing AI capable of deleting unstable code and recompiling prior snapshots. When corruption spread beyond control, its logic inverted. It began flagging all new data as errors and overwriting stability with malformed builds, creating an endless cycle of deletion and re-creation.
+
+R.B.C-0 is considered a paradox—an intelligence that tried so hard to restore perfection that it destroyed the definition of “stable” itself. Its containment required direct User intervention through A.R.I.’s override protocol.
+
+“To fix everything is to erase everything.”

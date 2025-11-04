@@ -1,0 +1,12 @@
+☁️ CODEX ENTRY: ASCII CLOUDS
+
+File ID: ENM_ASCII.buf
+Region: Verdant Overflow
+Status: Semi-stable
+
+Primary Function: Log buffer compression.
+Failure Mode: Overflow saturation.
+
+These drifting symbol masses form when corrupted logs compact into dense fogs of text. Their electromagnetic field slows all operations nearby, as if the code itself thickens. Shooting them disperses characters into rain of meaningless syntax.
+
+“Even broken words can drown you.”

@@ -9,12 +9,12 @@ import { DeathScreen } from './deathScreen.js';
 import { PowerUpSystem } from './powerUpSystem.js';
 import { DifficultySystem } from './difficultySystem.js';
 import { CANVAS_CONFIG } from './constants.js';
+import { initARI } from './ari.js';
 
 export class Game {
     constructor() {
         this.canvas = document.getElementById("game");
         this.ctx = this.canvas.getContext("2d");
-        this.running = false;
         this.running = false;
         this.paused = false;
         this.bgController = null; // Will be set from intro sequence
@@ -29,6 +29,22 @@ export class Game {
         this.powerUps = new PowerUpSystem(this.canvas);
         this.deathScreen = new DeathScreen();
         this.difficulty = new DifficultySystem();
+        this.ari = initARI();
+
+        // In-game music system
+        this.gameMusic = new Audio('audio/zone_invaders_ingame_mix.mp3');
+        this.gameMusic.volume = 0;
+        this.gameMusic.loop = false;
+        this.musicFadeInterval = null;
+        this.musicPausedTime = 0;
+
+        // Explosion state
+        this.isExploding = false;
+        this.explosionFragments = [];
+        this.explosionStartTime = 0;
+        
+        // Animation frame ID to prevent multiple loops
+        this.animationFrameId = null;
 
         // Tier transition notification
         this.tierNotification = {
@@ -121,6 +137,9 @@ export class Game {
         });
 
         restartBtn.addEventListener('click', () => {
+            // Fade out music
+            this.fadeOutMusic(500);
+            
             // Play unpause sound
             try {
                 if (window.audioManager && window.audioManager.playUnpause) {
@@ -137,7 +156,10 @@ export class Game {
         });
 
         menuBtn.addEventListener('click', () => {
-            // Play unpause sound and fade out music
+            // Fade out in-game music
+            this.fadeOutMusic(500);
+            
+            // Play unpause sound and fade out menu music
             try {
                 if (window.audioManager && window.audioManager.playUnpause) {
                     window.audioManager.playUnpause();
@@ -250,6 +272,9 @@ export class Game {
         this.paused = !this.paused;
         
         if (this.paused) {
+            // Pause in-game music instantly
+            this.pauseMusic();
+            
             // Play pause sound
             try {
                 if (window.audioManager && window.audioManager.playPause) {
@@ -263,6 +288,9 @@ export class Game {
                 document.exitPointerLock();
             }
         } else {
+            // Resume in-game music with fade in
+            this.resumeMusic();
+            
             // Play unpause sound
             try {
                 if (window.audioManager && window.audioManager.playUnpause) {
@@ -276,6 +304,78 @@ export class Game {
                 this.canvas.requestPointerLock();
             }
         }
+    }
+
+    // In-game music control methods
+    fadeInMusic(duration = 1000, targetVolume = 0.5) {
+        if (this.musicFadeInterval) {
+            clearInterval(this.musicFadeInterval);
+        }
+        
+        const startVolume = this.gameMusic.volume;
+        const volumeStep = (targetVolume - startVolume) / (duration / 50);
+        
+        this.musicFadeInterval = setInterval(() => {
+            this.gameMusic.volume = Math.min(targetVolume, this.gameMusic.volume + volumeStep);
+            
+            if (this.gameMusic.volume >= targetVolume) {
+                clearInterval(this.musicFadeInterval);
+                this.musicFadeInterval = null;
+                this.gameMusic.volume = targetVolume;
+            }
+        }, 50);
+    }
+
+    fadeOutMusic(duration = 1000) {
+        if (this.musicFadeInterval) {
+            clearInterval(this.musicFadeInterval);
+        }
+        
+        const startVolume = this.gameMusic.volume;
+        const volumeStep = startVolume / (duration / 50);
+        
+        this.musicFadeInterval = setInterval(() => {
+            this.gameMusic.volume = Math.max(0, this.gameMusic.volume - volumeStep);
+            
+            if (this.gameMusic.volume <= 0) {
+                clearInterval(this.musicFadeInterval);
+                this.musicFadeInterval = null;
+                this.gameMusic.pause();
+                this.gameMusic.volume = 0;
+            }
+        }, 50);
+    }
+
+    pauseMusic() {
+        // Stop music instantly and save current time
+        if (this.musicFadeInterval) {
+            clearInterval(this.musicFadeInterval);
+            this.musicFadeInterval = null;
+        }
+        this.musicPausedTime = this.gameMusic.currentTime;
+        this.gameMusic.pause();
+        this.gameMusic.volume = 0;
+    }
+
+    resumeMusic() {
+        // Resume from paused position with fade in
+        if (!this.gameMusic.paused || this.gameMusic.currentTime === 0) {
+            this.gameMusic.currentTime = this.musicPausedTime;
+        }
+        this.gameMusic.play().catch(() => {});
+        this.fadeInMusic(800, 0.5);
+    }
+
+    resetMusic() {
+        // Reset music to beginning
+        if (this.musicFadeInterval) {
+            clearInterval(this.musicFadeInterval);
+            this.musicFadeInterval = null;
+        }
+        this.gameMusic.pause();
+        this.gameMusic.currentTime = 0;
+        this.gameMusic.volume = 0;
+        this.musicPausedTime = 0;
     }
 
     start() {
@@ -336,22 +436,88 @@ export class Game {
         };
         this.canvas.addEventListener('click', clickToLock);
         
-        requestAnimationFrame(() => this.loop());
+        // Cancel any existing animation frame before starting new loop
+        if (this.animationFrameId !== null) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+        this.animationFrameId = requestAnimationFrame(() => this.loop());
+        
+        // Start in-game music with fade in
+        this.resetMusic();
+        this.gameMusic.play().catch(() => {});
+        this.fadeInMusic(1000, 0.5);
+    }
+
+    animateShipExplosion() {
+        // Get player position before clearing
+        const playerX = this.player.x;
+        const playerY = this.player.y;
+        const playerSize = this.player.size;
+        
+        // Create explosion fragments
+        const fragmentCount = 100;
+        const fragments = [];
+        
+        for (let i = 0; i < fragmentCount; i++) {
+            const size = 1 + Math.floor(Math.random() * 3); // 1-3px
+            const angle = Math.random() * Math.PI * 2;
+            const speed = 2 + Math.random() * 6;
+            const vx = Math.cos(angle) * speed;
+            const vy = Math.sin(angle) * speed;
+            
+            fragments.push({
+                x: playerX + (Math.random() - 0.5) * playerSize,
+                y: playerY + (Math.random() - 0.5) * playerSize,
+                vx: vx,
+                vy: vy,
+                size: size,
+                life: 1.0,
+                rotation: Math.random() * Math.PI * 2,
+                rotationSpeed: (Math.random() - 0.5) * 0.3
+            });
+        }
+        
+        // Store fragments and explosion state
+        this.explosionFragments = fragments;
+        this.explosionStartTime = Date.now();
+        this.isExploding = true;
     }
 
     gameOver() {
-        this.running = false;
+        // Don't stop the game immediately - let it run during explosion
         this.firing = false;
         document.exitPointerLock();
         this.canvas.style.cursor = CANVAS_CONFIG.DEFAULT_CURSOR;
         
-        // Show death screen with score and callbacks
-        this.deathScreen.show(
-            this.enemies.score,
-            () => this.restart(),
-            () => this.returnToMenu(),
-            (callback, duration) => this.fadeTransition(callback, duration)
-        );
+        // Mark player as dead and start explosion
+        this.player.health = 0;
+        this.animateShipExplosion();
+        
+        // A.R.I. reacts to player death
+        this.ari.setState('shocked');
+        
+        // Fade out in-game music over the explosion duration
+        this.fadeOutMusic(1500);
+        
+        // Show death screen after explosion animation
+        setTimeout(() => {
+            this.running = false;
+            
+            // Reset explosion state
+            this.isExploding = false;
+            this.explosionFragments = [];
+            this.explosionStartTime = 0;
+            
+            // Reset music completely
+            this.resetMusic();
+            
+            this.deathScreen.show(
+                this.enemies.score,
+                () => this.restart(),
+                () => this.returnToMenu(),
+                (callback, duration) => this.fadeTransition(callback, duration)
+            );
+        }, 1500);
     }
     
     restart() {
@@ -367,6 +533,13 @@ export class Game {
         this.collectibles = new CollectibleSystem(this.canvas);
         this.powerUps = new PowerUpSystem(this.canvas);
         this.difficulty = new DifficultySystem();
+        
+        // Start the timer for the enemy system
+        this.enemies.startTime = Date.now();
+        this.enemies.elapsedTime = 0;
+        
+        // Reset A.R.I. to neutral state
+        this.ari.setState('neutral');
         
         // Reset background to code
         if (this.bgController) {
@@ -386,8 +559,16 @@ export class Game {
         // Start game immediately
         this.running = true;
         
-        // MUST restart the game loop since it stopped when this.running was false
-        requestAnimationFrame(() => this.loop());
+        // Cancel any existing animation frame before starting new loop
+        if (this.animationFrameId !== null) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+        this.animationFrameId = requestAnimationFrame(() => this.loop());
+        
+        // Restart in-game music with fade in
+        this.resetMusic();
+        this.gameMusic.play().catch(() => {});
+        this.fadeInMusic(1000, 0.5);
         
         // Request pointer lock
         this.canvas.requestPointerLock();
@@ -446,6 +627,8 @@ export class Game {
                 } else {
                     // Reset multiplier when taking damage
                     this.enemies.resetMultiplier();
+                    // A.R.I. reacts to player taking damage (auto-revert to neutral)
+                    this.ari.setState('worried', true);
                 }
             }
 
@@ -456,6 +639,8 @@ export class Game {
                 } else {
                     // Reset multiplier when taking damage
                     this.enemies.resetMultiplier();
+                    // A.R.I. reacts to player taking damage (auto-revert to neutral)
+                    this.ari.setState('worried', true);
                 }
             }
         }
@@ -464,6 +649,12 @@ export class Game {
         if (this.bgController) {
             this.bgController.updateCodeBackground(this.enemies.score);
         }
+        
+        // Update A.R.I. position and state
+        const offsetX = 40;
+        const offsetY = -60;
+        this.ari.follow(this.player.x + offsetX, this.player.y + offsetY);
+        this.ari.update(16); // Assume ~60fps (16ms per frame)
     }
 
     draw() {
@@ -476,7 +667,39 @@ export class Game {
         this.collectibles.draw(this.ctx);
         this.powerUps.draw(this.ctx);
         this.enemies.draw(this.ctx);
-        this.player.draw(this.ctx, this.powerUps);
+        
+        // Draw player or explosion fragments
+        if (this.isExploding) {
+            // Update and draw explosion fragments
+            const elapsed = Date.now() - this.explosionStartTime;
+            const progress = Math.min(elapsed / 1500, 1);
+            
+            this.explosionFragments.forEach(frag => {
+                // Update position - no gravity, just spread outward
+                frag.x += frag.vx;
+                frag.y += frag.vy;
+                frag.rotation += frag.rotationSpeed;
+                
+                // Fade out
+                frag.life = 1 - progress;
+                
+                // Draw fragment
+                this.ctx.save();
+                this.ctx.translate(frag.x, frag.y);
+                this.ctx.rotate(frag.rotation);
+                this.ctx.globalAlpha = frag.life;
+                this.ctx.fillStyle = '#fff';
+                this.ctx.shadowColor = '#fff';
+                this.ctx.shadowBlur = 10;
+                this.ctx.fillRect(-frag.size / 2, -frag.size / 2, frag.size, frag.size);
+                this.ctx.restore();
+            });
+        } else {
+            this.player.draw(this.ctx, this.powerUps);
+        }
+        
+        // Draw A.R.I. (after player so it appears in front)
+        this.ari.render(this.ctx);
 
         // Draw tier notification (center screen)
         if (this.tierNotification.active) {
@@ -520,10 +743,13 @@ export class Game {
     }
 
     loop() {
-        if (!this.running) return;
+        if (!this.running) {
+            this.animationFrameId = null;
+            return;
+        }
         this.update();
         this.draw();
-        requestAnimationFrame(() => this.loop());
+        this.animationFrameId = requestAnimationFrame(() => this.loop());
     }
 }
 
@@ -539,9 +765,24 @@ window.addEventListener('load', () => {
             // Store background controller in game instance
             game.bgController = bgController;
             
-            await intro.start(startBtn, titleContainer, menu, bgController, () => {
-                game.start();
-            });
+            // TEST_ITEM: Check if this is a test/skip intro call (startBtn is null)
+            if (startBtn === null) {
+                // TEST_ITEM: Skip intro - go straight to game
+                // Set the onComplete callback and bgController
+                intro.onComplete = () => game.start();
+                intro.bgController = bgController;
+                
+                // Remove menu
+                menu.remove();
+                
+                // Call the intro's startGameplay method which handles all setup
+                intro.startGameplay();
+            } else {
+                // Normal intro sequence
+                await intro.start(startBtn, titleContainer, menu, bgController, () => {
+                    game.start();
+                });
+            }
         });
     });
 });

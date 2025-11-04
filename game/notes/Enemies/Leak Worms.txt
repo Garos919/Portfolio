@@ -1,0 +1,12 @@
+🪱 CODEX ENTRY: LEAK WORMS
+
+File ID: ENM_LEAKWORM.tmp
+Region: Verdant Overflow
+Status: Spreading
+
+Primary Function: Memory reclamation thread.
+Failure Mode: Endless growth.
+
+Designed to recycle unused memory blocks, the Leak Worms now consume active sectors, leaving behind dripping trails of zeroed data. Each movement erases bytes until the system forgets what once existed there.
+
+“They eat until the idea of memory itself collapses.”

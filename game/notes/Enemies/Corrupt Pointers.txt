@@ -1,0 +1,12 @@
+🧬 CODEX ENTRY: CORRUPT POINTERS
+
+File ID: ENM_PTR.err
+Region: Verdant Overflow
+Status: Viral
+
+Primary Function: Data reference manager.
+Failure Mode: Memory misdirection.
+
+Corrupt Pointers mislink clean data, leading processes into invalid addresses. Their movement appears erratic, yet each chase reflects a desperate attempt to find a valid host. Splitting behavior represents pointer duplication — the same bug multiplied until all space points to nothing.
+
+“Every address leads nowhere, yet they keep searching.”

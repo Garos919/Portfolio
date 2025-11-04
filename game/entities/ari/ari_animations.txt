@@ -1,0 +1,228 @@
+# A.R.I. — Emotion & Action States (v1.1)
+
+# [emotional_state]
+
+## [main_expressions]
+
+neutral:			<(o-o)>
+happy:			<(^-^)>
+sad:			<(∪-∪)>
+angry:			<(>-<)>
+surprised:			<(O.O)>
+confused:			<(@_@)>
+annoyed:			<(-_-)>
+worried:			<(o_O)>
+curious:			<(°-°)>
+shocked:			<(O-O)>
+
+## [micro_expressions]
+
+smirk:			<(^_-)>
+nervous:			<(°_°)>
+embarrassed:		<(>///<)>
+sleepy:			<(-.-)>
+disappointed:		<(v_v)>
+relieved:		<(=_=)>
+focused:			<(ò_ó)>
+hopeful:			<(^_^)>
+dizzy:			<(@_x)>
+tired:			<(-_-)> 
+bored:			<(¬_¬)>
+
+---
+
+# [system_state]
+
+corrupted:		<(#-#)>
+warning:			<(⚠-⚠)>
+glitch:			<(x_x)>
+error:			<(!!!)>
+shutdown:		<(___)>
+
+system_ok:		<(^-^)>	// quick confirm blink
+system_fail:		<(x_x)>	// quick failure blink
+
+---
+
+# [action_loops]
+
+## [communication]
+
+talk_1:			<(o-o)>
+talk_2:			<(o=o)>
+talk_3:			<(o-o)>
+talk_4:			<(o_o)>	#[loop]
+
+talk_glitch_1:		<(o-o)>
+talk_glitch_2:		<(o=0)>
+talk_glitch_3:		<(0-o)>
+talk_glitch_4:		<(o_0)>	#[loop]
+
+blink_1:			<(o-o)>
+blink_2:			<(-.o)>
+blink_3:			<(-.-)> 
+blink_4:			<(o.-)>	#[loop]
+
+## [processing]
+
+scan_1:			<(o-o)>
+scan_2:			<(o>o)>
+scan_3:			<(o<o)>
+scan_4:			<(o-o)>	#[loop]
+
+analyze_1:		<(o.o)>
+analyze_2:		<(O.o)>
+analyze_3:		<(O.O)>
+analyze_4:		<(o.O)>	#[loop]
+
+## [system_loop]
+
+glitch_loop_1:		<(x_x)>
+glitch_loop_2:		<(x_X)>
+glitch_loop_3:		<(X_x)>
+glitch_loop_4:		<(x_x)>	#[loop]
+
+data_in_1:		<(o•o)>
+data_in_2:		<(•o•)>	#[loop]
+
+data_out_1:		<(•o•)>
+data_out_2:		<(o•o)>	#[loop]
+
+ping_1:			<(o-o)>
+ping_2:			<(*-*)>
+ping_3:			<(o-o)>	#[loop]
+
+processing_1:		<(o.o)>
+processing_2:		<(o°o)>
+processing_3:		<(°o°)>
+processing_4:		<(o°o)>	#[loop]
+
+scan_flash_1:		<(o>o)>
+scan_flash_2:		<(o<o)>
+scan_flash_3:		<(o>o)>
+scan_flash_4:		<(o-o)>	#[loop]
+
+error_flash_1:		<(!!!)>
+error_flash_2:		<(!_!)>
+error_flash_3:		<(!!!)>	#[loop]
+
+## [ambient]
+
+idle_1:			<(o-o)>
+idle_2:			<(o_o)>
+idle_3:			<(o-o)>
+idle_4:			<(o-o)>	#[loop]
+
+load_1:			<(o..)>
+load_2:			<(o°.)>
+load_3:			<(o°°)>
+load_4:			<(o°.)>	#[loop]
+
+---
+
+
+# [state_transitions]
+
+## [emotional_state_transitions]
+
+neutral_entry_1:		<(-.-)>
+neutral_entry_2:		<(._.)>
+neutral_entry_3:		<(o.o)>
+neutral_entry_4:		<(o_o)>	#[enter emotional_state: neutral]
+
+happy_entry_1:		<(o-o)>
+happy_entry_2:		<(o^o)>
+happy_entry_3:		<(^_^)>
+happy_entry_4:		<(^.^)>	#[enter emotional_state: happy]
+
+sad_entry_1:		<(o-o)>
+sad_entry_2:		<(o∩o)>
+sad_entry_3:		<(∪_∪)>
+sad_entry_4:		<(∪.∪)>	#[enter emotional_state: sad]
+
+angry_entry_1:		<(o-o)>
+angry_entry_2:		<(>_o)>
+angry_entry_3:		<(>_O)>
+angry_entry_4:		<(>o<)>#[enter emotional_state: angry]
+
+surprised_entry_1:	<(o-o)>
+surprised_entry_2:	<(O.o)>
+surprised_entry_3:	<(O_o)>
+surprised_entry_4:	<(O0O)>	#[enter emotional_state: surprised]
+
+confused_entry_1:	<(o-o)>
+confused_entry_2:	<(o@o)>
+confused_entry_3:	<(o_o)>
+confused_entry_4:	<(@o@)>	#[enter emotional_state: confused]
+
+annoyed_entry_1:		<(o-o)>
+annoyed_entry_2:		<(-.-)>
+annoyed_entry_3:		<(-_.)>
+annoyed_entry_4:		<(-_-)>	#[enter emotional_state: annoyed]
+
+worried_entry_1:		<(o-o)>
+worried_entry_2:		<(o_O)>
+worried_entry_3:		<(O_o)>
+worried_entry_4:		<(O_O)>	#[enter emotional_state: worried]
+
+curious_entry_1:		<(o-o)>
+curious_entry_2:		<(o_o)>
+curious_entry_3:		<(°_o)>
+curious_entry_4:		<(°_°)>	#[enter emotional_state: curious]
+
+shocked_entry_1:		<(o-o)>
+shocked_entry_2:		<(O_o)>
+shocked_entry_3:		<(O0O)>
+shocked_entry_4:		<(O_O)>	#[enter emotional_state: shocked]
+
+---
+
+## [system_state_transitions]
+
+corrupted_entry_1:	<(x_!)>
+corrupted_entry_2:	<(=/0)>
+corrupted_entry_3:	<(0~0)>
+corrupted_entry_4:	<(@_@)>
+corrupted_entry_5:	<(x-x)>
+corrupted_entry_6:	<(O_O)>
+corrupted_entry_7:	<(=_=)>
+corrupted_entry_8:	<(x_X)>
+corrupted_entry_9:	<(@_x)>
+corrupted_entry_10:	<(x_x)>
+corrupted_entry_11:	<(=/0)>
+corrupted_entry_12:	<(0~0)>
+corrupted_entry_13:	<(@_@)>
+corrupted_entry_14:	<(>_<)>
+corrupted_entry_15:	<(>o<)>
+corrupted_entry_16:	<(>0<)>
+corrupted_entry_17:	<(>~<)>
+corrupted_entry_18:	<(>x<)>
+corrupted_entry_19:	<(#x#)>
+corrupted_entry_20:	<(#_#)>	#[enter system_state: corrupted]
+
+warning_entry_1:		<(o-o)>
+warning_entry_2:		<(o⚠o)>
+warning_entry_3:		<(⚠_⚠)>
+warning_entry_4:		<(⚠-⚠)>#[enter system_state: warning]
+
+glitch_entry_1:		<(o-o)>
+glitch_entry_2:		<(X-o)>
+glitch_entry_3:		<(x_X)>
+glitch_entry_4:		<(X_x)>	#[enter system_state: glitch]
+
+error_entry_1:		<(o-o)>
+error_entry_2:		<(o!o)>
+error_entry_3:		<(!0!)>
+error_entry_4:		<(!!!)>	#[enter system_state: error]
+
+shutdown_entry_1:	<(o-o)>
+shutdown_entry_2:	<(x-x)>
+shutdown_entry_3:	<(x_x)>
+shutdown_entry_4:	<(x-x)>	#[enter system_state: shutdown]
+
+reboot_entry_1:		<(_._)>
+reboot_entry_2:		<(-.-)>
+reboot_entry_3:		<(o.o)>
+reboot_entry_4:		<(o-o)>
+
+---

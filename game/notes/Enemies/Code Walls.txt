@@ -1,0 +1,12 @@
+🧱 CODEX ENTRY: CODE WALLS
+
+File ID: ENM_CODEWALL.bin
+Region: Crimson Terminal
+Status: Structural hazard
+
+Primary Function: Compile-time boundary generator.
+Failure Mode: Persistent materialization.
+
+Code Walls were meant to define memory partitions during compilation. Now they manifest permanently, slicing through space as luminous barriers. They drift unpredictably, re-aligning boundaries that no longer exist.
+
+“Even the walls forgot what they divide.”

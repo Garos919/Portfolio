@@ -1,0 +1,24 @@
+💀 CODEX ENTRY — REGION 03: THE CRIMSON TERMINAL
+
+File ID: REGION_CRIMSONTERM.log
+Status: Locked → Restored at Level 8
+
+Corrupted (Locked)
+
+CR!MSON_TERM> I/O ERR0R—rollback=∞  
+unhandled_exc3ption()  
+> compile...fail
+
+
+Restored (Unlocked)
+
+Region 03 — The Crimson Terminal
+The system’s endpoint—where processes end and memory bleeds into nothing.
+Reality flickers between deletion and rewrite.
+Here resides R.B.C-0, the Rollback Compiler, locked in its infinite repair loop.
+
+Dominant Color: Red / Black
+Corruption Level: Critical
+Primary Threats: All entities + R.B.C-0
+
+“Every line of code dreams of being executed — once.”

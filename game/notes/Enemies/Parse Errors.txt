@@ -1,0 +1,14 @@
+⚠️ CODEX ENTRY: PARSE ERRORS
+
+File ID: ERR_PARSE.line
+Region: The Neon Kernel
+Status: Active
+
+Primary Function: Syntax validation.
+Failure Mode: Recursive self-reference.
+
+These fragments are the first stage of system failure — floating remnants of broken statements and incomplete functions. Their bodies flicker between words like if, for, and null, endlessly trying to finish their own line of code.
+
+They drift aimlessly, harmless alone but overwhelming in swarms. Destroying them releases faint text dust that reforms seconds later elsewhere.
+
+“They don’t know what they’re saying. They just keep trying to finish the sentence.”

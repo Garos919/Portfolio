@@ -1,0 +1,13 @@
+🧨 CODEX ENTRY: FATAL EXCEPTIONS
+
+File ID: ERR_FATAL.sys
+Region: The Crimson Terminal
+Status: Critical
+
+Primary Function: Emergency shutdown protocol.
+Failure Mode: Hostile termination.
+
+When all else fails, the system spawns these red hazard sigils — the last defense mechanism. On contact, they execute kill commands indiscriminately, terminating any nearby process including their own.
+They don’t pursue the player; they await them.
+
+“They end everything, even themselves.”

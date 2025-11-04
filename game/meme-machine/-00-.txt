@@ -1,0 +1,42 @@
+classic							0classic_periptosh.mp3				0classic_periptosh.gif				0classic_periptosh2.gif				rank1
+Broke, alone and with cats				0sad-meow.mp3					0sad-meow.gif					0sad-meow2.gif					rank1
+We all knew it						0he-knew.mp3					0he-knew.gif					0he-knew2.gif					rank1
+You are a great debugger				0illusions.mp3					0illusions.gif					0illusions2.gif					rank1
+I gave you my heart, you gave me bugs			0indian-christmas.mp3				0indian-christmas.gif				0indian-christmas2.gif				rank1
+Huh... you are a funnu guy				0final-credits.mp3				0final-credits.gif				0final-credits2.gif				rank1
+Straight to NASA					0for-real.mp3					0for-real.gif					0for-real2.gif					rank1
+Between us... you dont know whats wrong in that code	0spider-man-wabble.mp3				0spider-man-wabble.gif				0spider-man-wabble2.gif				rank1
+oiia							0oiia.mp3					0oiia.gif					0oiia2.gif					rank1
+Your code synchronizing with the rest of the project	0carribean-flute.mp3				0carribean-flute.gif				0carribean-flute2.gif				rank1
+Why are you still here?					0eh-eh.mp3					0eh-eh.gif					0eh-eh2.gif					rank1
+You smuggled bugs in the final product			0the-best-pirate-ive-ever-seen.mp3		0the-best-pirate-ive-ever-seen.gif		0the-best-pirate-ive-ever-seen2.gif		rank1
+no escaping now						0adonh-agaph-mou.mp3				0adonh-agaph-mou.gif				0adonh-agaph-mou2.gif				rank1
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Stop doing the chinese and go study			0chinese.mp3					0chinese.gif					0chinese2.gif					rank2
+I know chill..						0albanian-curses.mp3				0albanian-curses.gif				0albanian-curses2.gif				rank2
+You aint convincing anyone				0i-know-what-you-did.mp3			0i-know-what-you-did.gif			0i-know-what-you-did2.gif			rank2
+You were the problem all along				0dun-dun-dun.mp3				0dun-dun-dun.gif				0dun-dun-dun2.gif				rank2
+Fixing bugs for the last hour i see			0keyboard-bang.mp3				0keyboard-bang.gif				0keyboard-bang2.gif				rank2
+Finally it boots.. nevermind				0ps2.mp3					0ps2.gif					0ps22.gif					rank2
+You almost had something there				0super-mario-maybe-not.mp3			0super-mario-maybe-not.gif			0super-mario-maybe-not2.gif			rank2
+We all have bad days					0sad-violin.mp3					0sad-violin.gif					0sad-violin2.gif				rank2
+I understand						0they-just-dont-get-it.mp3			0they-just-dont-get-it.gif			0they-just-dont-get-it2.gif			rank2
+Is that you talking to co-pilot?			0why-you-put-cheese-on-my-cheeseburger.mp3	0why-you-put-cheese-on-my-cheeseburger.gif	0why-you-put-cheese-on-my-cheeseburger2.gif	rank2
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+You low-k chillin					0chill-sax-guy.mp3				0chill-sax-guy.gif				0chill-sax-guy2.gif				rank3
+Oh.. mhh.. you work so elegantly			0elegant-work.mp3				0elegant-work.gif				0elegant-work2.gif				rank3
+Mission Passed. +respect				0mission-passed-+respect.mp3			0mission-passed-+respect.gif			0mission-passed-+respect2.gif			rank3
+Leave some bugs for the rest of us			0anastasia_boosted.mp3				0anastasia_boosted.gif				0anastasia_boosted2.gif				rank3
+Uhm... what are you doing to this bug?			0love-bug.mp3					0love-bug.gif					0love-bug2.gif					rank3
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+aura +1000000						0aura-farmer.mp3				0aura-farmer.gif				0aura-farmer2.gif				rank4
+The GOAT						0the-goat.mp3					0the-goat.gif					0the-goat2.gif					rank4
+Ok Ok ill say it calm down				0say-my-name.mp3				0say-my-name.gif				0say-my-name2.gif				rank4
+You take everything so personal?			0sigma.mp3					0sigma.gif					0sigma2.gif					rank4
+You catch bugs before they reach your web		0spiderman-power.mp3				0spiderman-power.gif				0spiderman-power2.gif				rank4
+I run out of bugs dude					0xios-kai-allo.mp3				0xios-kai-allo.gif				0xios-kai-allo2.gif				rank4
+
+rank1=score 0-300
+rank2=score 300-700
+rank3=score 700-1200
+rank4=score 1200+

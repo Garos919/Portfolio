@@ -1,0 +1,12 @@
+👻 CODEX ENTRY: PHANTOM PROCESSES
+
+File ID: ENM_PHANTOMPROC.ghz
+Region: Crimson Terminal
+Status: Ephemeral
+
+Primary Function: Cached process echoes.
+Failure Mode: Residual execution.
+
+They appear as flickering copies of prior enemies — semi-transparent, out of sync with reality. These ghosts are threads the system forgot to terminate, forever executing instructions that no longer exist.
+
+“The dead still run.”

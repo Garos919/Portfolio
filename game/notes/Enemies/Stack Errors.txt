@@ -1,0 +1,12 @@
+🔄 CODEX ENTRY: STACK ERRORS
+
+File ID: ERR_STACK.ovf
+Region: The Verdant Overflow → The Crimson Terminal
+Status: Unstable
+
+Primary Function: Recursive function limiter.
+Failure Mode: Infinite call loop.
+
+Manifesting as vertical waves of red text that cascade upward, Stack Errors represent runaway recursion. Each new spawn overlaps with its predecessors, gradually filling the screen with repeating patterns. Destroying one triggers short visual distortion — the system “resetting” its call stack.
+
+“They fall upward forever.”

@@ -1,0 +1,12 @@
+🧩 CODEX ENTRY: DATA CUBES
+
+File ID: ENM_DATACUBE.mem
+Region: Neon Kernel
+Status: Active
+
+Primary Function: Memory storage modules.
+Failure Mode: Loop-locked and self-replicating.
+
+Once the orderly foundation of system architecture, Data Cubes maintained perfect lattice grids of pure code. When corruption spread through their index tables, they began rotating endlessly, colliding with one another in attempts to “realign.” Their fractured surfaces now emit residual light from unreleased calculations.
+
+“They remember everything — even the crashes.”
