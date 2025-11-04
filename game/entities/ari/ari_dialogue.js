@@ -167,7 +167,7 @@ const ariDialogue = {
   surprised: {
     scared_reactions: [
       'f1n@lly! y0u\'r3 g01ng t0 d0 s0m3th1ng?',
-      'y0u\'r3 @l1v3!?'
+      'y0u\'r3 @l1v3!?',
       '0h d@mn y0u\'r3 b@ck'
     ],
     general: [
