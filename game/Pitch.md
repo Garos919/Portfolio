@@ -4,6 +4,7 @@
 > 🚨 **NOTICE:** Due to browser autoplay policies, sounds may not start automatically when opening through this link.  
 > **Audio will enable once you interact with the page (e.g., click anywhere).**  
 > **Not compatible with phones (maybe later), only with PCs.**
+> Some parts of the game might currently **break or behave unexpectedly**, but I wanted to share it with everyone at this stage for early feedback and discussion.
 > 
 > **Zone Invaders** originally began as a lighthearted **Zone01-themed parody**, but as usual for me, the more I worked on it, the more I wanted it to become *something more*. *(More on that later.)*  
 >
