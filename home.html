@@ -601,46 +601,7 @@
       ariButtonPanic();
     });
     
-    let touchStartTime = 0;
-    
-    gameButton.addEventListener('touchstart', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      touchStartTime = Date.now();
-      
-      if (hoverSound) {
-        hoverSound.currentTime = 0;
-        hoverSound.volume = 0.3;
-        hoverSound.play().catch(e => {});
-      }
-      
-      // Make A.R.I. panic about the button
-      isHoveringButton = true;
-      ariButtonPanic();
-    });
-    
-    gameButton.addEventListener('touchend', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const touchDuration = Date.now() - touchStartTime;
-      
-      isHoveringButton = false;
-      // Stop shivering
-      if (shiverInterval) {
-        clearInterval(shiverInterval);
-        shiverInterval = null;
-      }
-      
-      // If it was a quick tap (less than 500ms), trigger the click
-      if (touchDuration < 500) {
-        // Trigger the button click programmatically
-        gameButton.click();
-      } else {
-        // A.R.I. shows relief when touch ends without clicking
-        ariButtonRelief();
-      }
-    });
+
     
     gameButton.addEventListener('mouseenter', () => {
       if (hoverSound) {
