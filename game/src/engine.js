@@ -56,6 +56,7 @@ export class Game {
 
         this.createPauseOverlay();
         this.setupEventListeners();
+        this.setupTouchControls();
     }
 
     createPauseOverlay() {
@@ -236,6 +237,73 @@ export class Game {
         }, duration);
     }
 
+    setupTouchControls() {
+        this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+        this.touchControls = document.getElementById('touchControls');
+        this.moveArea = document.getElementById('moveArea');
+        this.fireArea = document.getElementById('fireArea');
+        
+        if (this.isTouchDevice) {
+            this.touchControls.classList.add('active');
+            
+            // Touch movement variables
+            this.touchMoving = false;
+            this.touchStartPos = { x: 0, y: 0 };
+            this.touchCurrentPos = { x: 0, y: 0 };
+            
+            // Movement area touch events
+            this.moveArea.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!this.running || this.paused) return;
+                
+                const touch = e.touches[0];
+                const rect = this.moveArea.getBoundingClientRect();
+                this.touchStartPos = {
+                    x: touch.clientX - rect.left - rect.width / 2,
+                    y: touch.clientY - rect.top - rect.height / 2
+                };
+                this.touchMoving = true;
+                this.moveArea.style.background = 'rgba(0, 255, 255, 0.3)';
+            });
+            
+            this.moveArea.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                if (!this.touchMoving || !this.running || this.paused) return;
+                
+                const touch = e.touches[0];
+                const rect = this.moveArea.getBoundingClientRect();
+                this.touchCurrentPos = {
+                    x: touch.clientX - rect.left - rect.width / 2,
+                    y: touch.clientY - rect.top - rect.height / 2
+                };
+            });
+            
+            this.moveArea.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.touchMoving = false;
+                this.moveArea.style.background = 'rgba(0, 255, 255, 0.1)';
+            });
+            
+            // Fire area touch events
+            this.fireArea.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                if (!this.running || this.paused) return;
+                
+                this.player.firing = true;
+                this.fireArea.style.background = 'rgba(255, 0, 0, 0.3)';
+            });
+            
+            this.fireArea.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.player.firing = false;
+                this.fireArea.style.background = 'rgba(0, 255, 255, 0.1)';
+            });
+            
+            // Prevent context menu on long press
+            this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
+        }
+    }
+
     setupEventListeners() {
         document.addEventListener("pointerlockchange", () => {
             this.mouseLocked = document.pointerLockElement === this.canvas;
@@ -243,7 +311,7 @@ export class Game {
         });
 
         document.addEventListener("mousemove", (e) => {
-            if (this.running && this.mouseLocked && !this.paused) {
+            if (this.running && this.mouseLocked && !this.paused && !this.isTouchDevice) {
                 const speedMultiplier = this.obstacles.checkPlayerInCloud(this.player) ? 0.25 : 1;
                 this.player.x += e.movementX * speedMultiplier;
                 this.player.y += e.movementY * speedMultiplier;
@@ -253,11 +321,15 @@ export class Game {
         });
 
         this.canvas.addEventListener("mousedown", (e) => {
-            if (e.button === 0 && this.running && !this.paused) this.firing = true;
+            if (e.button === 0 && this.running && !this.paused && !this.isTouchDevice) {
+                this.firing = true;
+            }
         });
 
         this.canvas.addEventListener("mouseup", (e) => {
-            if (e.button === 0) this.firing = false;
+            if (e.button === 0 && !this.isTouchDevice) {
+                this.firing = false;
+            }
         });
 
         document.addEventListener("keydown", (e) => {
@@ -423,18 +495,23 @@ export class Game {
 
         this.running = true;
         this.firing = false;
-        this.canvas.style.cursor = CANVAS_CONFIG.NO_CURSOR;
         
-        // Request pointer lock - if it fails, add click listener
-        this.canvas.requestPointerLock();
-        
-        // Add fallback click listener to engage pointer lock
-        const clickToLock = () => {
-            if (this.running && !this.mouseLocked) {
-                this.canvas.requestPointerLock();
-            }
-        };
-        this.canvas.addEventListener('click', clickToLock);
+        if (this.isTouchDevice) {
+            // For touch devices, don't use pointer lock
+            this.canvas.style.cursor = 'default';
+        } else {
+            // For desktop, use pointer lock
+            this.canvas.style.cursor = CANVAS_CONFIG.NO_CURSOR;
+            this.canvas.requestPointerLock();
+            
+            // Add fallback click listener to engage pointer lock
+            const clickToLock = () => {
+                if (this.running && !this.mouseLocked) {
+                    this.canvas.requestPointerLock();
+                }
+            };
+            this.canvas.addEventListener('click', clickToLock);
+        }
         
         // Cancel any existing animation frame before starting new loop
         if (this.animationFrameId !== null) {
@@ -570,9 +647,13 @@ export class Game {
         this.gameMusic.play().catch(() => {});
         this.fadeInMusic(1000, 0.5);
         
-        // Request pointer lock
-        this.canvas.requestPointerLock();
-        this.canvas.style.cursor = CANVAS_CONFIG.LOCKED_CURSOR;
+        // Handle cursor and pointer lock based on device type
+        if (this.isTouchDevice) {
+            this.canvas.style.cursor = 'default';
+        } else {
+            this.canvas.requestPointerLock();
+            this.canvas.style.cursor = CANVAS_CONFIG.NO_CURSOR;
+        }
     }
     
     returnToMenu() {
@@ -604,10 +685,26 @@ export class Game {
             }
         }
 
+        // Handle touch movement
+        if (this.isTouchDevice && this.touchMoving && this.running && !this.paused) {
+            const speedMultiplier = this.obstacles.checkPlayerInCloud(this.player) ? 0.25 : 1;
+            const moveSpeed = 3 * speedMultiplier;
+            
+            // Calculate movement based on touch offset from center
+            const deltaX = this.touchCurrentPos.x - this.touchStartPos.x;
+            const deltaY = this.touchCurrentPos.y - this.touchStartPos.y;
+            
+            // Apply movement with bounds checking
+            this.player.x += deltaX * moveSpeed * 0.1;
+            this.player.y += deltaY * moveSpeed * 0.1;
+            this.player.x = Math.max(this.player.size, Math.min(this.canvas.width - this.player.size, this.player.x));
+            this.player.y = Math.max(this.player.size, Math.min(this.canvas.height - this.player.size, this.player.y));
+        }
+
         // Update all systems
         this.background.update();
         this.particles.update();
-        this.player.update(this.firing, this.powerUps);
+        this.player.update(this.firing || (this.isTouchDevice && this.player.firing), this.powerUps);
         this.enemies.update();
         this.obstacles.update();
         this.collectibles.update();

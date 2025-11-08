@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0" />
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 
   <!-- retro pixel font -->
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -27,6 +30,9 @@
       align-items: center;
       background: #000;
       overflow: hidden;
+      touch-action: none;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
     #gradientOverlay {
       position: fixed;
@@ -77,9 +83,27 @@
       position: relative;
       width: 700px;
       height: 700px;
-      max-width: 90vw;
-      max-height: 90vh;
+      max-width: 95vw;
+      max-height: 95vh;
       z-index: 11;
+    }
+    
+    /* Mobile portrait optimization */
+    @media (orientation: portrait) and (max-width: 768px) {
+      #gameContainer {
+        width: 95vw;
+        height: 95vw;
+        max-height: 70vh;
+      }
+    }
+    
+    /* Mobile landscape optimization */
+    @media (orientation: landscape) and (max-height: 500px) {
+      #gameContainer {
+        width: 85vh;
+        height: 85vh;
+        max-width: 95vw;
+      }
     }
     canvas {
       display: block;
@@ -89,6 +113,7 @@
       height: 100%;
       box-sizing: border-box;
       z-index: 1;
+      touch-action: none;
     }
     #introOverlay {
       position: absolute;
@@ -121,8 +146,18 @@
       color: #fff;
       text-align: center;
       min-width: 300px;
+      max-width: 90%;
       opacity: 0;
       transition: opacity 0.3s ease;
+      box-sizing: border-box;
+    }
+    
+    @media (max-width: 480px) {
+      .dialogue-box {
+        padding: 15px;
+        font-size: 10px;
+        min-width: 250px;
+      }
     }
     .dialogue-box.active {
       opacity: 1;
@@ -150,6 +185,12 @@
       opacity: 0;
       animation: pulse 1s infinite;
     }
+    
+    @media (max-width: 480px) {
+      .warning {
+        font-size: 48px;
+      }
+    }
     @keyframes pulse {
       0%, 100% { opacity: 0.5; }
       50% { opacity: 1; }
@@ -165,6 +206,75 @@
       opacity: 0;
       text-align: center;
       white-space: nowrap;
+    }
+    
+    @media (max-width: 480px) {
+      .mission-text {
+        font-size: 14px;
+        white-space: normal;
+        max-width: 90%;
+      }
+    }
+    
+    /* Touch controls overlay */
+    #touchControls {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 100;
+      pointer-events: none;
+      display: none;
+    }
+    
+    #touchControls.active {
+      display: block;
+      pointer-events: auto;
+    }
+    
+    .touch-area {
+      position: absolute;
+      background: rgba(0, 255, 255, 0.1);
+      border: 1px solid rgba(0, 255, 255, 0.3);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: rgba(0, 255, 255, 0.6);
+      font-size: 12px;
+      text-align: center;
+      user-select: none;
+    }
+    
+    #moveArea {
+      bottom: 20px;
+      left: 20px;
+      width: 120px;
+      height: 120px;
+    }
+    
+    #fireArea {
+      bottom: 20px;
+      right: 20px;
+      width: 80px;
+      height: 80px;
+    }
+    
+    @media (max-width: 480px) {
+      #moveArea {
+        width: 100px;
+        height: 100px;
+        bottom: 15px;
+        left: 15px;
+      }
+      
+      #fireArea {
+        width: 70px;
+        height: 70px;
+        bottom: 15px;
+        right: 15px;
+      }
     }
     
     /* Background stars for menu */
@@ -220,6 +330,10 @@
       <div id="warning" class="warning">⚠</div>
       <div id="missionText" class="mission-text">ELIMINATE CODE ERRORS</div>
     </div>
+    <div id="touchControls">
+      <div id="moveArea" class="touch-area">MOVE</div>
+      <div id="fireArea" class="touch-area">FIRE</div>
+    </div>
   </div>
   
   <!-- Background Music -->
@@ -264,6 +378,11 @@
   
   <script type="module" src="src/menu.js"></script>
   <script type="module" src="src/engine.js"></script>
+  <script type="module">
+    import { checkAndShowTouchInstructions } from './touch-instructions.js';
+    // Show touch instructions for mobile users
+    checkAndShowTouchInstructions();
+  </script>
   <script>
     // Page load fade-in effect
     window.addEventListener('load', () => {
