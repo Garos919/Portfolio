@@ -144,7 +144,7 @@ export function createMenu(startCallback) {
 
     // Version display under title
     const versionDisplay = document.createElement("div");
-    versionDisplay.textContent = "v0.5.7";
+    versionDisplay.textContent = "v0.6.0";
     Object.assign(versionDisplay.style, {
         fontFamily: "'Press Start 2P', monospace",
         fontSize: "10px",

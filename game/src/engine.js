@@ -42,6 +42,7 @@ export class Game {
         this.isExploding = false;
         this.explosionFragments = [];
         this.explosionStartTime = 0;
+        this.gameOverTriggered = false;
         
         // Animation frame ID to prevent multiple loops
         this.animationFrameId = null;
@@ -57,6 +58,7 @@ export class Game {
         this.createPauseOverlay();
         this.setupEventListeners();
         this.setupTouchControls();
+        this.setupVisibilityHandling();
     }
 
     createPauseOverlay() {
@@ -282,8 +284,8 @@ export class Game {
     
     updateTouchPosition(touch) {
         const now = Date.now();
-        // Limit touch updates to 60fps to prevent overly fast movement
-        if (this.lastTouchUpdate && now - this.lastTouchUpdate < 16) return;
+        // Limit touch updates to 30fps to prevent overly fast movement on mobile
+        if (this.lastTouchUpdate && now - this.lastTouchUpdate < 33) return;
         this.lastTouchUpdate = now;
         
         const rect = this.canvas.getBoundingClientRect();
@@ -332,6 +334,44 @@ export class Game {
                 this.togglePause();
             }
         });
+    }
+
+    setupVisibilityHandling() {
+        // Handle screen turning off/on for mobile devices
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                // Screen turned off or app backgrounded
+                if (this.running && !this.paused) {
+                    this.togglePause(); // Auto-pause
+                }
+                this.muteAllAudio();
+            } else {
+                // Screen turned on or app foregrounded
+                this.unmuteAllAudio();
+            }
+        });
+    }
+
+    muteAllAudio() {
+        // Mute in-game music
+        if (this.gameMusic) {
+            this.gameMusic.muted = true;
+        }
+        // Mute menu music if available
+        if (window.audioManager && window.audioManager.menuMusic) {
+            window.audioManager.menuMusic.muted = true;
+        }
+    }
+
+    unmuteAllAudio() {
+        // Unmute in-game music
+        if (this.gameMusic) {
+            this.gameMusic.muted = false;
+        }
+        // Unmute menu music if available
+        if (window.audioManager && window.audioManager.menuMusic) {
+            window.audioManager.menuMusic.muted = false;
+        }
     }
 
     togglePause() {
@@ -559,6 +599,10 @@ export class Game {
     }
 
     gameOver() {
+        // Prevent duplicate game over calls
+        if (this.gameOverTriggered) return;
+        this.gameOverTriggered = true;
+        
         // Don't stop the game immediately - let it run during explosion
         this.firing = false;
         document.exitPointerLock();
@@ -630,6 +674,7 @@ export class Game {
         // Reset firing state
         this.firing = false;
         this.paused = false;
+        this.gameOverTriggered = false;
         
         // Start game immediately
         this.running = true;
