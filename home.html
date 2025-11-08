@@ -158,7 +158,7 @@
       letter-spacing: 6px;
       transform: perspective(400px) scaleX(1.2) rotateX(25deg);
       text-shadow: 0 0 8px #0ff, 0 0 20px #0ff;
-      margin-bottom: -10px;
+      margin-bottom: 10px;
     }
     
     .button-invaders {
@@ -586,7 +586,7 @@
     // Add hover sound
     const hoverSound = document.getElementById('hoverSound');
     
-    const addHoverEffect = () => {
+    gameButton.addEventListener('mouseenter', () => {
       if (hoverSound) {
         hoverSound.currentTime = 0;
         hoverSound.volume = 0.3;
@@ -596,12 +596,32 @@
       // Make A.R.I. panic about the button
       isHoveringButton = true;
       ariButtonPanic();
-    };
+    });
     
-    gameButton.addEventListener('mouseenter', addHoverEffect);
     gameButton.addEventListener('touchstart', (e) => {
       e.preventDefault();
-      addHoverEffect();
+      if (hoverSound) {
+        hoverSound.currentTime = 0;
+        hoverSound.volume = 0.3;
+        hoverSound.play().catch(e => {});
+      }
+      
+      // Make A.R.I. panic about the button
+      isHoveringButton = true;
+      ariButtonPanic();
+    });
+    
+    gameButton.addEventListener('touchend', (e) => {
+      e.preventDefault();
+      isHoveringButton = false;
+      // Stop shivering
+      if (shiverInterval) {
+        clearInterval(shiverInterval);
+        shiverInterval = null;
+      }
+      
+      // A.R.I. shows relief when touch ends
+      ariButtonRelief();
     });
     
     gameButton.addEventListener('mouseenter', () => {

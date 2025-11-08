@@ -242,7 +242,6 @@ export class Game {
         this.mobilePauseBtn = document.getElementById('mobilePauseBtn');
         
         if (this.isTouchDevice) {
-            this.mobilePauseBtn.classList.add('active');
             this.touchActive = false;
             
             // Canvas touch events for direct ship control
@@ -488,6 +487,10 @@ export class Game {
         if (this.isTouchDevice) {
             // For touch devices, don't use pointer lock
             this.canvas.style.cursor = 'default';
+            // Show mobile pause button when game starts
+            if (this.mobilePauseBtn) {
+                this.mobilePauseBtn.classList.add('active');
+            }
         } else {
             // For desktop, use pointer lock
             this.canvas.style.cursor = CANVAS_CONFIG.NO_CURSOR;
