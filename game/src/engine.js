@@ -243,6 +243,7 @@ export class Game {
         
         if (this.isTouchDevice) {
             this.touchActive = false;
+            this.lastTouchUpdate = 0;
             
             // Canvas touch events for direct ship control
             this.canvas.addEventListener('touchstart', (e) => {
@@ -280,6 +281,11 @@ export class Game {
     }
     
     updateTouchPosition(touch) {
+        const now = Date.now();
+        // Limit touch updates to 60fps to prevent overly fast movement
+        if (this.lastTouchUpdate && now - this.lastTouchUpdate < 16) return;
+        this.lastTouchUpdate = now;
+        
         const rect = this.canvas.getBoundingClientRect();
         const scaleX = this.canvas.width / rect.width;
         const scaleY = this.canvas.height / rect.height;

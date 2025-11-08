@@ -112,6 +112,7 @@ export function createMenu(startCallback) {
         letterSpacing: "6px",
         transform: "perspective(400px) scaleX(1.2) rotateX(25deg)",
         textShadow: "0 0 8px #0ff, 0 0 20px #0ff",
+        marginBottom: "10px"
     });
 
     const invaders = document.createElement("div");
@@ -123,6 +124,21 @@ export function createMenu(startCallback) {
         transform: "perspective(400px) scaleX(1.4) rotateX(35deg)",
         textShadow: "0 0 8px #f33, 0 0 20px #f33",
     });
+    
+    // Mobile responsiveness
+    const isMobile = window.innerWidth <= 768;
+    if (isMobile) {
+        zone.style.fontSize = "28px";
+        zone.style.letterSpacing = "4px";
+        invaders.style.fontSize = "32px";
+        invaders.style.letterSpacing = "3px";
+    }
+    if (window.innerWidth <= 480) {
+        zone.style.fontSize = "20px";
+        zone.style.letterSpacing = "2px";
+        invaders.style.fontSize = "24px";
+        invaders.style.letterSpacing = "2px";
+    }
 
     titleContainer.append(zone, invaders);
 
@@ -147,11 +163,11 @@ export function createMenu(startCallback) {
         color: "#000",
         fontFamily: "'Press Start 2P', monospace",
         fontWeight: "normal",
-        padding: "15px 30px",
+        padding: isMobile ? "12px 20px" : "15px 30px",
         borderRadius: "0",
         cursor: "pointer",
         marginTop: "20px",
-        fontSize: "14px",
+        fontSize: isMobile ? "12px" : "14px",
         boxShadow: "0 4px 0 #088, 0 0 20px rgba(0,255,255,0.5)",
         textShadow: "1px 1px 0 rgba(0,0,0,0.3)",
         imageRendering: "pixelated",
@@ -184,11 +200,11 @@ export function createMenu(startCallback) {
         color: "#000",
         fontFamily: "'Press Start 2P', monospace",
         fontWeight: "normal",
-        padding: "15px 30px",
+        padding: isMobile ? "12px 20px" : "15px 30px",
         borderRadius: "0",
         cursor: "pointer",
         marginTop: "10px",
-        fontSize: "14px",
+        fontSize: isMobile ? "12px" : "14px",
         boxShadow: "0 4px 0 #833, 0 0 20px rgba(255,51,51,0.5)",
         textShadow: "1px 1px 0 rgba(0,0,0,0.3)",
         imageRendering: "pixelated",
@@ -222,11 +238,11 @@ export function createMenu(startCallback) {
         color: "#000",
         fontFamily: "'Press Start 2P', monospace",
         fontWeight: "normal",
-        padding: "15px 30px",
+        padding: isMobile ? "10px 16px" : "15px 30px",
         borderRadius: "0",
         cursor: "pointer",
         marginTop: "10px",
-        fontSize: "12px",
+        fontSize: isMobile ? "10px" : "12px",
         boxShadow: "0 4px 0 #860, 0 0 20px rgba(255,170,0,0.5)",
         textShadow: "1px 1px 0 rgba(0,0,0,0.3)",
         imageRendering: "pixelated",
