@@ -387,6 +387,105 @@
         line-height: 1.6;
       }
     }
+    
+    /* Linktree Link Styles */
+    .linktree-container {
+      margin-top: 40px;
+    }
+    
+    .linktree-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      padding: 12px 20px;
+      background: linear-gradient(45deg, #111, #222);
+      border: 2px solid #0ff;
+      border-radius: 8px;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .linktree-link::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.2), transparent);
+      transition: left 0.5s ease;
+    }
+    
+    .linktree-link:hover::before {
+      left: 100%;
+    }
+    
+    .linktree-link:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 255, 255, 0.3);
+      border-color: #fff;
+    }
+    
+    .linktree-icon {
+      font-size: 20px;
+      filter: drop-shadow(0 0 5px #0ff);
+    }
+    
+    .linktree-text {
+      font-family: 'Press Start 2P', monospace;
+      font-size: 12px;
+      color: #0ff;
+      text-shadow: 0 0 8px #0ff;
+      letter-spacing: 2px;
+    }
+    
+    .linktree-link:hover .linktree-text {
+      color: #fff;
+      text-shadow: 0 0 12px #fff;
+    }
+    
+    @media (max-width: 768px) {
+      .linktree-container {
+        margin-top: 30px;
+      }
+      
+      .linktree-link {
+        padding: 10px 16px;
+        gap: 10px;
+      }
+      
+      .linktree-icon {
+        font-size: 18px;
+      }
+      
+      .linktree-text {
+        font-size: 10px;
+        letter-spacing: 1px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .linktree-container {
+        margin-top: 25px;
+      }
+      
+      .linktree-link {
+        padding: 8px 14px;
+        gap: 8px;
+      }
+      
+      .linktree-icon {
+        font-size: 16px;
+      }
+      
+      .linktree-text {
+        font-size: 9px;
+        letter-spacing: 1px;
+      }
+    }
   </style>
 </head>
 <body>
@@ -442,6 +541,14 @@
       <div class="button-zone">ZONE</div>
       <div class="button-invaders">INVADERS</div>
     </a>
+    
+    <!-- Social Links -->
+    <div class="linktree-container">
+      <a href="social.html" class="linktree-link">
+        <div class="linktree-icon">🌐</div>
+        <div class="linktree-text">CONNECT</div>
+      </a>
+    </div>
   </div>
   
   <!-- Scattered error messages -->
@@ -585,23 +692,10 @@
     
     // Flash effect for button click
     const gameButton = document.querySelector('.game-button');
+    const linktreeButton = document.querySelector('.linktree-link');
     
     // Add hover sound
     const hoverSound = document.getElementById('hoverSound');
-    
-    gameButton.addEventListener('mouseenter', () => {
-      if (hoverSound) {
-        hoverSound.currentTime = 0;
-        hoverSound.volume = 0.3;
-        hoverSound.play().catch(e => {});
-      }
-      
-      // Make A.R.I. panic about the button
-      isHoveringButton = true;
-      ariButtonPanic();
-    });
-    
-
     
     gameButton.addEventListener('mouseenter', () => {
       if (hoverSound) {
@@ -625,6 +719,27 @@
       
       // A.R.I. shows relief when mouse leaves button
       ariButtonRelief();
+    });
+    
+    // Linktree button hover reactions
+    linktreeButton.addEventListener('mouseenter', () => {
+      if (hoverSound) {
+        hoverSound.currentTime = 0;
+        hoverSound.volume = 0.2;
+        hoverSound.play().catch(e => {});
+      }
+      
+      // A.R.I. gets excited about the linktree
+      ariLinktreeExcitement();
+    });
+    
+    linktreeButton.addEventListener('mouseleave', () => {
+      // A.R.I. returns to normal after linktree hover
+      setTimeout(() => {
+        if (!isHoveringButton && !ariPlayingMessageChain) {
+          scheduleNextAction();
+        }
+      }, 1000);
     });
     
     gameButton.addEventListener('click', (e) => {
@@ -2000,6 +2115,57 @@
       setTimeout(() => {
         scheduleNextAction();
       }, 3500);
+    };
+    
+    // A.R.I. gets excited about linktree button
+    const ariLinktreeExcitement = () => {
+      // Don't interrupt if already doing something important
+      if (ariIsPlayingWelcome || ariPlayingMessageChain) return;
+      
+      // Stop normal behaviors
+      ariInvestigatingMouse = false;
+      ariCirclingMouse = false;
+      ariBeingPushed = false;
+      
+      // Get excited!
+      setAriState('happy', false, true);
+      
+      const excitementMessages = [
+        'Pr3ss 1t! Pr3ss 1t!',
+        '3xc1t1ng stuff @w@1ts y0u th3r3!',
+        'G0 ch3ck 0ut my cr3@t0r\'s s0c1@ls!',
+        'Y3s! C0nn3ct w1th my cr3@t0r!',
+        'Th@t l00ks 1nt3r3st1ng!',
+        'D0 1t! D0 1t! D0 1t!',
+        'My cr3@t0r\'s l1nks @r3 th3r3!',
+        'S0c1@l m3d1@ t1m3! >:D',
+        'C0nn3ct1ons @w@1t!',
+        'Cl1ck th@t sh1ny butt0n!',
+        'F0ll0w my cr3@t0r 3v3ryWh3r3!',
+        'H3\'s g0t @m@z1ng c0nt3nt!',
+        'My m@k3r w@nts t0 c0nn3ct!',
+        'Th3 0n3 wh0 c0d3d m3 1s th3r3!',
+        'G0 s33 wh@t my cr3@t0r 1s up t0!',
+        'H3 bu1lt m3, n0w m33t h1m!',
+        'My 0r1g1n@t0r @w@1ts y0ur v1s1t!',
+        'Th3 m1nd b3h1nd my c0d3!',
+        'F1nd my cr3@t0r\'s 0th3r pr0j3cts!',
+        'H3 m@d3 m3, h3\'ll 1mpr3ss y0u t00!',
+        'My d3v3l0p3r h@s m0r3 t0 sh0w!',
+        'Th3 @rch1t3ct 0f my 3x1st3nc3!',
+        'G0 @ppr3c1@t3 my m@k3r\'s w0rk!',
+        'H3 wr0t3 my c0d3, s33 h1s 0th3rs!',
+        'My pr0gr@mm3r 1s w@1t1ng!'
+      ];
+      
+      const message = excitementMessages[Math.floor(Math.random() * excitementMessages.length)];
+      showAriBubble(message, 5000, 'linktree');
+      
+      // Set message chain flag briefly
+      ariPlayingMessageChain = true;
+      setTimeout(() => {
+        ariPlayingMessageChain = false;
+      }, 5500);
     };
     
     // A.R.I. panic and fly off screen when button is clicked

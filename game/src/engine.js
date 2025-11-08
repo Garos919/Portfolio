@@ -337,11 +337,14 @@ export class Game {
     }
 
     setupVisibilityHandling() {
-        // Handle screen turning off/on for mobile devices
+        // Handle screen turning off/on for mobile devices - only when game is running
         document.addEventListener('visibilitychange', () => {
+            // Only handle visibility changes when we're actually in the game
+            if (!this.running) return;
+            
             if (document.hidden) {
                 // Screen turned off or app backgrounded
-                if (this.running && !this.paused) {
+                if (!this.paused) {
                     this.togglePause(); // Auto-pause
                 }
                 this.muteAllAudio();
@@ -353,24 +356,16 @@ export class Game {
     }
 
     muteAllAudio() {
-        // Mute in-game music
+        // Only mute game audio, not home page audio
         if (this.gameMusic) {
             this.gameMusic.muted = true;
-        }
-        // Mute menu music if available
-        if (window.audioManager && window.audioManager.menuMusic) {
-            window.audioManager.menuMusic.muted = true;
         }
     }
 
     unmuteAllAudio() {
-        // Unmute in-game music
+        // Only unmute game audio
         if (this.gameMusic) {
             this.gameMusic.muted = false;
-        }
-        // Unmute menu music if available
-        if (window.audioManager && window.audioManager.menuMusic) {
-            window.audioManager.menuMusic.muted = false;
         }
     }
 
