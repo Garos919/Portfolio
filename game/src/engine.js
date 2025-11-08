@@ -239,69 +239,58 @@ export class Game {
 
     setupTouchControls() {
         this.isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
-        this.touchControls = document.getElementById('touchControls');
-        this.moveArea = document.getElementById('moveArea');
-        this.fireArea = document.getElementById('fireArea');
+        this.mobilePauseBtn = document.getElementById('mobilePauseBtn');
         
         if (this.isTouchDevice) {
-            this.touchControls.classList.add('active');
+            this.mobilePauseBtn.classList.add('active');
+            this.touchActive = false;
             
-            // Touch movement variables
-            this.touchMoving = false;
-            this.touchStartPos = { x: 0, y: 0 };
-            this.touchCurrentPos = { x: 0, y: 0 };
-            
-            // Movement area touch events
-            this.moveArea.addEventListener('touchstart', (e) => {
+            // Canvas touch events for direct ship control
+            this.canvas.addEventListener('touchstart', (e) => {
                 e.preventDefault();
                 if (!this.running || this.paused) return;
                 
-                const touch = e.touches[0];
-                const rect = this.moveArea.getBoundingClientRect();
-                this.touchStartPos = {
-                    x: touch.clientX - rect.left - rect.width / 2,
-                    y: touch.clientY - rect.top - rect.height / 2
-                };
-                this.touchMoving = true;
-                this.moveArea.style.background = 'rgba(0, 255, 255, 0.3)';
-            });
-            
-            this.moveArea.addEventListener('touchmove', (e) => {
-                e.preventDefault();
-                if (!this.touchMoving || !this.running || this.paused) return;
-                
-                const touch = e.touches[0];
-                const rect = this.moveArea.getBoundingClientRect();
-                this.touchCurrentPos = {
-                    x: touch.clientX - rect.left - rect.width / 2,
-                    y: touch.clientY - rect.top - rect.height / 2
-                };
-            });
-            
-            this.moveArea.addEventListener('touchend', (e) => {
-                e.preventDefault();
-                this.touchMoving = false;
-                this.moveArea.style.background = 'rgba(0, 255, 255, 0.1)';
-            });
-            
-            // Fire area touch events
-            this.fireArea.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                if (!this.running || this.paused) return;
-                
+                this.touchActive = true;
                 this.player.firing = true;
-                this.fireArea.style.background = 'rgba(255, 0, 0, 0.3)';
+                this.updateTouchPosition(e.touches[0]);
             });
             
-            this.fireArea.addEventListener('touchend', (e) => {
+            this.canvas.addEventListener('touchmove', (e) => {
                 e.preventDefault();
-                this.player.firing = false;
-                this.fireArea.style.background = 'rgba(0, 255, 255, 0.1)';
+                if (!this.touchActive || !this.running || this.paused) return;
+                
+                this.updateTouchPosition(e.touches[0]);
             });
             
-            // Prevent context menu on long press
+            this.canvas.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                this.touchActive = false;
+                this.player.firing = false;
+            });
+            
+            // Mobile pause button
+            this.mobilePauseBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (this.running) this.togglePause();
+            });
+            
+            // Prevent context menu
             this.canvas.addEventListener('contextmenu', (e) => e.preventDefault());
         }
+    }
+    
+    updateTouchPosition(touch) {
+        const rect = this.canvas.getBoundingClientRect();
+        const scaleX = this.canvas.width / rect.width;
+        const scaleY = this.canvas.height / rect.height;
+        
+        const x = (touch.clientX - rect.left) * scaleX;
+        const y = (touch.clientY - rect.top) * scaleY;
+        
+        // Keep ship within bounds
+        this.player.x = Math.max(this.player.size, Math.min(this.canvas.width - this.player.size, x));
+        this.player.y = Math.max(this.player.size, Math.min(this.canvas.height - this.player.size, y));
     }
 
     setupEventListeners() {
@@ -683,22 +672,6 @@ export class Game {
             if (Date.now() - this.tierNotification.startTime > this.tierNotification.duration) {
                 this.tierNotification.active = false;
             }
-        }
-
-        // Handle touch movement
-        if (this.isTouchDevice && this.touchMoving && this.running && !this.paused) {
-            const speedMultiplier = this.obstacles.checkPlayerInCloud(this.player) ? 0.25 : 1;
-            const moveSpeed = 3 * speedMultiplier;
-            
-            // Calculate movement based on touch offset from center
-            const deltaX = this.touchCurrentPos.x - this.touchStartPos.x;
-            const deltaY = this.touchCurrentPos.y - this.touchStartPos.y;
-            
-            // Apply movement with bounds checking
-            this.player.x += deltaX * moveSpeed * 0.1;
-            this.player.y += deltaY * moveSpeed * 0.1;
-            this.player.x = Math.max(this.player.size, Math.min(this.canvas.width - this.player.size, this.player.x));
-            this.player.y = Math.max(this.player.size, Math.min(this.canvas.height - this.player.size, this.player.y));
         }
 
         // Update all systems

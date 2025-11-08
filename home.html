@@ -2,7 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0, minimum-scale=1.0">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>Nicholas Garos - Under Construction</title>
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <style>
@@ -23,6 +26,9 @@
       overflow: hidden;
       position: relative;
       height: 100vh;
+      touch-action: manipulation;
+      -webkit-touch-callout: none;
+      -webkit-tap-highlight-color: transparent;
     }
     
     /* Code background */
@@ -49,8 +55,14 @@
       align-items: center;
       justify-content: center;
       height: 100vh;
-      padding: 40px;
+      padding: 20px;
       text-align: center;
+    }
+    
+    @media (max-width: 768px) {
+      .content {
+        padding: 15px;
+      }
     }
     
     .construction-warning {
@@ -76,6 +88,21 @@
       letter-spacing: 2px;
     }
     
+    @media (max-width: 768px) {
+      h1 {
+        font-size: 18px;
+        margin-bottom: 25px;
+        letter-spacing: 1px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      h1 {
+        font-size: 14px;
+        margin-bottom: 20px;
+      }
+    }
+    
     .message {
       font-family: 'Press Start 2P', monospace;
       font-size: 10px;
@@ -83,6 +110,21 @@
       margin-bottom: 20px;
       max-width: 500px;
       line-height: 1.8;
+    }
+    
+    @media (max-width: 768px) {
+      .message {
+        font-size: 9px;
+        max-width: 90%;
+        margin-bottom: 15px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .message {
+        font-size: 8px;
+        line-height: 1.6;
+      }
     }
     
     .arrow {
@@ -128,6 +170,30 @@
       text-shadow: 0 0 8px #f33, 0 0 20px #f33;
     }
     
+    @media (max-width: 768px) {
+      .button-zone {
+        font-size: 28px;
+        letter-spacing: 4px;
+      }
+      
+      .button-invaders {
+        font-size: 32px;
+        letter-spacing: 3px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .button-zone {
+        font-size: 20px;
+        letter-spacing: 2px;
+      }
+      
+      .button-invaders {
+        font-size: 24px;
+        letter-spacing: 2px;
+      }
+    }
+    
     .game-button:hover .button-zone {
       text-shadow: 0 0 15px #0ff, 0 0 30px #0ff, 0 0 50px #0ff;
     }
@@ -144,6 +210,20 @@
       color: #f33;
       opacity: 0.6;
       pointer-events: none;
+    }
+    
+    @media (max-width: 768px) {
+      .error-line {
+        font-size: 10px;
+        opacity: 0.4;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .error-line {
+        font-size: 8px;
+        opacity: 0.3;
+      }
     }
     
     /* Coding symbols (stars) */
@@ -286,6 +366,23 @@
       padding: 15px;
       z-index: 200;
       line-height: 1.8;
+    }
+    
+    @media (max-width: 768px) {
+      #scoreBoard {
+        top: 10px;
+        right: 10px;
+        font-size: 9px;
+        padding: 10px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      #scoreBoard {
+        font-size: 8px;
+        padding: 8px;
+        line-height: 1.6;
+      }
     }
   </style>
 </head>
@@ -488,6 +585,24 @@
     
     // Add hover sound
     const hoverSound = document.getElementById('hoverSound');
+    
+    const addHoverEffect = () => {
+      if (hoverSound) {
+        hoverSound.currentTime = 0;
+        hoverSound.volume = 0.3;
+        hoverSound.play().catch(e => {});
+      }
+      
+      // Make A.R.I. panic about the button
+      isHoveringButton = true;
+      ariButtonPanic();
+    };
+    
+    gameButton.addEventListener('mouseenter', addHoverEffect);
+    gameButton.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      addHoverEffect();
+    });
     
     gameButton.addEventListener('mouseenter', () => {
       if (hoverSound) {

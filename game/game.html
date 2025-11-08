@@ -216,65 +216,46 @@
       }
     }
     
-    /* Touch controls overlay */
-    #touchControls {
+    /* Mobile pause button */
+    #mobilePauseBtn {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      z-index: 100;
-      pointer-events: none;
+      top: 15px;
+      left: 15px;
+      width: 40px;
+      height: 40px;
+      background: rgba(0, 0, 0, 0.7);
+      border: 2px solid #0ff;
+      border-radius: 6px;
       display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      cursor: pointer;
+      touch-action: manipulation;
     }
     
-    #touchControls.active {
-      display: block;
-      pointer-events: auto;
+    #mobilePauseBtn.active {
+      display: flex;
     }
     
-    .touch-area {
-      position: absolute;
-      background: rgba(0, 255, 255, 0.1);
-      border: 1px solid rgba(0, 255, 255, 0.3);
-      border-radius: 8px;
+    #mobilePauseBtn:active {
+      background: rgba(0, 255, 255, 0.2);
+    }
+    
+    .pause-icon {
+      width: 16px;
+      height: 16px;
       display: flex;
       align-items: center;
       justify-content: center;
-      color: rgba(0, 255, 255, 0.6);
-      font-size: 12px;
-      text-align: center;
-      user-select: none;
+      gap: 3px;
     }
     
-    #moveArea {
-      bottom: 20px;
-      left: 20px;
-      width: 120px;
-      height: 120px;
-    }
-    
-    #fireArea {
-      bottom: 20px;
-      right: 20px;
-      width: 80px;
-      height: 80px;
-    }
-    
-    @media (max-width: 480px) {
-      #moveArea {
-        width: 100px;
-        height: 100px;
-        bottom: 15px;
-        left: 15px;
-      }
-      
-      #fireArea {
-        width: 70px;
-        height: 70px;
-        bottom: 15px;
-        right: 15px;
-      }
+    .pause-line {
+      width: 3px;
+      height: 12px;
+      background: #0ff;
+      border-radius: 1px;
     }
     
     /* Background stars for menu */
@@ -330,9 +311,11 @@
       <div id="warning" class="warning">⚠</div>
       <div id="missionText" class="mission-text">ELIMINATE CODE ERRORS</div>
     </div>
-    <div id="touchControls">
-      <div id="moveArea" class="touch-area">MOVE</div>
-      <div id="fireArea" class="touch-area">FIRE</div>
+    <div id="mobilePauseBtn">
+      <div class="pause-icon">
+        <div class="pause-line"></div>
+        <div class="pause-line"></div>
+      </div>
     </div>
   </div>
   
